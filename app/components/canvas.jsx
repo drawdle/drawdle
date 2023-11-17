@@ -72,18 +72,12 @@ export default class DrawingCanvas extends React.Component {
       this.canvas.isdragging = true;
     };
     this.canvas.onpointerup = (e) => {
-      console.log(e);
       this.canvas.isdragging = false;
     };
     this.canvas.onpointermove = (e) => {
       if (this.state.tool == "Pan" && this.canvas.isdragging) {
         this.canvasMove(e.movementX, e.movementY);
       }
-    };
-    this.canvas.onscroll = (e) => {
-      e.preventDefault();
-      console.log(e);
-      this.canvasSetZoom(e.deltaY / 100 + 1);
     };
 
     this.draw();
