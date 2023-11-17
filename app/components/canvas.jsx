@@ -36,6 +36,12 @@ export default class DrawingCanvas extends React.Component {
             );
             this.setState({ toolbarGrabbing: false });
             this.setState({ toolbarRelPos: null });
+            this.setState({
+              toolbarPos: {
+                x: clamp(this.state.toolbarPos.x, 4, window.innerWidth - 144),
+                y: clamp(this.state.toolbarPos.y, 68, window.innerHeight - 52),
+              },
+            });
           },
           { once: true }
         );
@@ -103,7 +109,13 @@ export default class DrawingCanvas extends React.Component {
           ].map((e, i) => (
             <button
               key={i}
-              className="w-8 h-8 bg-transparent hover:bg-[#fff1] rounded"
+              className={
+                (this.state.tool == e.text ? "bg-[#fff2] " : "") +
+                "w-8 h-8 bg-transparent hover:bg-[#fff4] rounded"
+              }
+              onClick={() => {
+                this.setState({ tool: e.text });
+              }}
             >
               <i className={e.icon}></i>
             </button>
