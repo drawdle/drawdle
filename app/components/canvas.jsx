@@ -51,10 +51,49 @@ export default class DrawingCanvas extends React.Component {
     };
   }
 
+  componentDidMount() {
+    this.canvas = document.getElementById("drawingCanvas");
+    this.ctx = this.canvas.getContext("2d");
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight - 64;
+
+    // Initialize canvas
+    this.ctx.fillStyle = "white";
+    this.canvasProperties = {
+      width: 1920,
+      height: 1080,
+      zoom: 1,
+      offset: {
+        x: 0,
+        y: 0,
+      },
+    };
+    this.moveCanvas(0, 0);
+    this.ctx.fillRect(
+      this.canvas.width / 2 - this.canvasProperties.width / 2,
+      this.canvas.height / 2 - this.canvasProperties.height / 2,
+      this.canvas.width / 2 + this.canvasProperties.width / 2,
+      this.canvas.height / 2 + this.canvasProperties.height / 2
+    );
+  }
+
+  moveCanvas(x, y) {
+    this.canvasProperties.offset = {
+      x: x,
+      y: y,
+    };
+    this.ctx.translate(x, y);
+  }
+
+  canvasSetZoom(zoom) {
+    this.canvasProperties.zoom = zoom;
+    this.ctx.scale(zoom, zoom);
+  }
+
   render() {
     return (
       <>
-        <canvas id="drawingCanvas"></canvas>
+        <canvas id="drawingCanvas" className="fixed top-16 left-0"></canvas>
         <div
           id="toolbar"
           className="flex justify-start items-center p-2 bg-beige-800 fixed text-beige-200 rounded-md gap-1"
