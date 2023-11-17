@@ -78,6 +78,11 @@ export default class DrawingCanvas extends React.Component {
         this.canvasMove(e.movementX, e.movementY);
       }
     };
+    this.canvas.onscroll = (e) => {
+      e.preventDefault();
+      console.log(e);
+      this.canvasSetZoom(e.deltaY / 100 + 1);
+    };
 
     this.draw();
   }
@@ -91,13 +96,14 @@ export default class DrawingCanvas extends React.Component {
       this.canvas.height
     );
     this.ctx.fillStyle = "white";
-    this.ctx.fillRect(
-      this.canvas.width / 2 - this.canvasProperties.width / 2,
-      this.canvas.height / 2 - this.canvasProperties.height / 2,
-      this.canvasProperties.width,
-      this.canvasProperties.height
-    );
-    // this.ctx.fillRect(20, 20, 100, 100);
+    this.withDropShadow(() => {
+      this.ctx.fillRect(
+        this.canvas.width / 2 - this.canvasProperties.width / 2,
+        this.canvas.height / 2 - this.canvasProperties.height / 2,
+        this.canvasProperties.width,
+        this.canvasProperties.height
+      );
+    });
   }
 
   canvasMove(x, y) {
@@ -111,6 +117,18 @@ export default class DrawingCanvas extends React.Component {
     this.canvasProperties.zoom = zoom;
     this.ctx.scale(zoom, zoom);
     this.draw();
+  }
+
+  withDropShadow(cb) {
+    this.ctx.shadowColor = "#0002";
+    this.ctx.shadowBlur = 10;
+    this.ctx.shadowOffsetX = 5;
+    this.ctx.shadowOffsetY = 5;
+    cb();
+    this.ctx.shadowColor = "transparent";
+    this.ctx.shadowBlur = 0;
+    this.ctx.shadowOffsetX = 0;
+    this.ctx.shadowOffsetY = 0;
   }
 
   render() {
@@ -184,8 +202,9 @@ export default class DrawingCanvas extends React.Component {
             <button
               key={i}
               className={
-                (this.state.tool == e.text ? "bg-[#fff2] " : "") +
-                "w-8 h-8 bg-transparent hover:bg-[#fff4] rounded"
+                (this.state.tool == e.text
+                  ? "bg-[#fff2] "
+                  : "bg-transparent ") + "w-8 h-8 hover:bg-[#fff4] rounded"
               }
               onClick={() => {
                 this.setState({ tool: e.text });
