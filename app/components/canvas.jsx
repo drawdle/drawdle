@@ -149,6 +149,14 @@ export default class DrawingCanvas extends React.Component {
               text: "Line",
               icon: "bi-slash-lg",
             },
+            {
+              text: "Zoom",
+              icon: "bi-zoom-in",
+            },
+            {
+              text: "Zoom out",
+              icon: "bi-zoom-out",
+            },
           ].map((e, i) => (
             <button
               key={i}
