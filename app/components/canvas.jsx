@@ -56,38 +56,61 @@ export default class DrawingCanvas extends React.Component {
     this.ctx = this.canvas.getContext("2d");
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight - 64;
-
-    // Initialize canvas
-    this.ctx.fillStyle = "white";
     this.canvasProperties = {
-      width: 1920,
-      height: 1080,
+      width: 720,
+      height: 480,
       zoom: 1,
       offset: {
         x: 0,
         y: 0,
       },
     };
-    this.moveCanvas(0, 0);
+
+    // https://codepen.io/chengarda/pen/wRxoyB
+    this.canvas.onpointerdown = (e) => {
+      this.canvas.isdragging = true;
+    };
+    this.canvas.onpointerup = (e) => {
+      this.canvas.isdragging = false;
+    };
+    this.canvas.onpointermove = (e) => {
+      if (this.state.tool == "Pan" && this.canvas.isdragging) {
+        this.canvasMove(e.movementX, e.movementY);
+      }
+    };
+
+    this.draw();
+  }
+
+  draw() {
+    this.ctx.fillStyle = "#2e2b26";
+    this.ctx.fillRect(
+      0 - this.canvasProperties.offset.x,
+      0 - this.canvasProperties.offset.y,
+      this.canvas.width,
+      this.canvas.height
+    );
+    this.ctx.fillStyle = "white";
     this.ctx.fillRect(
       this.canvas.width / 2 - this.canvasProperties.width / 2,
       this.canvas.height / 2 - this.canvasProperties.height / 2,
-      this.canvas.width / 2 + this.canvasProperties.width / 2,
-      this.canvas.height / 2 + this.canvasProperties.height / 2
+      this.canvasProperties.width,
+      this.canvasProperties.height
     );
+    // this.ctx.fillRect(20, 20, 100, 100);
   }
 
-  moveCanvas(x, y) {
-    this.canvasProperties.offset = {
-      x: x,
-      y: y,
-    };
+  canvasMove(x, y) {
+    this.canvasProperties.offset.x += x;
+    this.canvasProperties.offset.y += y;
     this.ctx.translate(x, y);
+    this.draw();
   }
 
   canvasSetZoom(zoom) {
     this.canvasProperties.zoom = zoom;
     this.ctx.scale(zoom, zoom);
+    this.draw();
   }
 
   render() {
