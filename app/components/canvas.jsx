@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import "../disableSwipeGesture.css";
 
 const clamp = (x, a, b) => Math.max(a, Math.min(x, b));
 
@@ -71,6 +72,7 @@ export default class DrawingCanvas extends React.Component {
       this.canvas.isdragging = true;
     };
     this.canvas.onpointerup = (e) => {
+      console.log(e);
       this.canvas.isdragging = false;
     };
     this.canvas.onpointermove = (e) => {
@@ -120,21 +122,32 @@ export default class DrawingCanvas extends React.Component {
   }
 
   withDropShadow(cb) {
+    const originalShadowColor = this.ctx.shadowColor;
+    const originalShadowBlur = this.ctx.shadowBlur;
+    const originalShadowOffsetX = this.ctx.shadowOffsetX;
+    const originalShadowOffsetY = this.ctx.shadowOffsetY;
     this.ctx.shadowColor = "#0002";
     this.ctx.shadowBlur = 10;
     this.ctx.shadowOffsetX = 5;
     this.ctx.shadowOffsetY = 5;
     cb();
-    this.ctx.shadowColor = "transparent";
-    this.ctx.shadowBlur = 0;
-    this.ctx.shadowOffsetX = 0;
-    this.ctx.shadowOffsetY = 0;
+    this.ctx.shadowColor = originalShadowColor;
+    this.ctx.shadowBlur = originalShadowBlur;
+    this.ctx.shadowOffsetX = originalShadowOffsetX;
+    this.ctx.shadowOffsetY = originalShadowOffsetY;
   }
 
   render() {
     return (
       <>
-        <canvas id="drawingCanvas" className="fixed top-16 left-0"></canvas>
+        <canvas
+          id="drawingCanvas"
+          className="fixed top-16 left-0"
+          style={{
+            // VERY IMPORTANT, CANVAS WILL NOT WORK ON TOUCHSCREEN OTHERWISE
+            touchAction: "none",
+          }}
+        ></canvas>
         <div
           id="toolbar"
           className="flex justify-start items-center p-2 bg-beige-800 fixed text-beige-200 rounded-md gap-1"
