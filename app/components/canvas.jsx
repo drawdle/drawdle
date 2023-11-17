@@ -8,7 +8,7 @@ export default class DrawingCanvas extends React.Component {
     super(props);
 
     this.state = {
-      tool: "Draw",
+      tool: "Pan",
       toolbarGrabbing: false,
       toolbarMoveListenerCb: (e) => {
         if (this.state.toolbarRelPos == null) {
@@ -94,6 +94,10 @@ export default class DrawingCanvas extends React.Component {
             <i className="bi-grip-vertical"></i>
           </div>
           {[
+            {
+              text: "Pan",
+              icon: "bi-arrows-move",
+            },
             {
               text: "Draw",
               icon: "bi-pencil",
