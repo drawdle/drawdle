@@ -1,16 +1,7 @@
 "use client";
 import React from "react";
 import "../disableSwipeGesture.css";
-
-/**
- * Clamp a value between a minimum and maximum bound.
- *
- * @param {number} x - The value to clamp.
- * @param {number} a - The minimum bound.
- * @param {number} b - The maximum bound.
- * @returns {number} - The clamped value.
- */
-const clamp = (x, a, b) => Math.max(a, Math.min(x, b));
+import { clamp, mean } from "../utils/math";
 
 export default class DrawingCanvas extends React.Component {
   constructor(props) {
@@ -91,31 +82,87 @@ export default class DrawingCanvas extends React.Component {
       },
     };
     this.canvasProperties.offset = {
-      x: this.canvas.width / 2 - this.canvasProperties.width / 2,
-      y: this.canvas.height / 2 - this.canvasProperties.height / 2,
+      x: this.canvas.width / 2,
+      y: this.canvas.height / 2,
     };
+
+    // Track multiple pointers
+    this.activePointers = [];
+    this.activePointersDist = -1;
 
     // Add event listeners
     const handlePointerDown = (e) => {
+      this.activePointers.push(e);
       if (this.state.tool == "Pan") {
         this.canvas.isgrabbing = true;
       }
     };
     const handlePointerUp = (e) => {
+      const index = this.activePointers.findIndex(
+        (p) => p.pointerId === e.pointerId
+      );
+      this.activePointers.splice(index, 1);
       if (this.state.tool == "Pan") {
         this.canvas.isgrabbing = false;
       }
     };
+
+    // https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events/Pinch_zoom_gestures
     const handlePointerMove = (e) => {
-      if (this.state.tool == "Pan") {
-        if (this.canvas.isgrabbing) {
-          this.canvasMove(e.movementX, e.movementY);
+      // Find this event in the cache and update its record with this event
+      const index = this.activePointers.findIndex(
+        (p) => p.pointerId === e.pointerId
+      );
+      this.activePointers[index] = e;
+
+      if (this.activePointers.length == 1) {
+        if (this.state.tool == "Pan") {
+          if (this.canvas.isgrabbing) {
+            this.canvasMove(e.movementX, e.movementY);
+          }
         }
+      }
+      // If two pointers are down, check for pinch gestures
+      else if (this.activePointers.length == 2) {
+        // Calculate the distance between the two pointers
+        const curDiff = Math.hypot(
+          this.activePointers[0].clientX - this.activePointers[1].clientX,
+          this.activePointers[0].clientY - this.activePointers[1].clientY
+        );
+
+        if (this.activePointersDist > 0) {
+          if (curDiff > this.activePointersDist) {
+            // zoom in
+            this.canvasSetZoom(this.canvasProperties.zoom * 1.005);
+          }
+          if (curDiff < this.activePointersDist) {
+            // zoom out
+            this.canvasSetZoom(this.canvasProperties.zoom / 1.005);
+          }
+          // Pan
+          this.canvasMove(
+            mean([
+              this.activePointers[0].movementX,
+              this.activePointers[1].movementX,
+            ]) / 2,
+            mean([
+              this.activePointers[0].movementY,
+              this.activePointers[1].movementY,
+            ]) / 2
+          );
+        }
+
+        // Cache the distance for the next move event
+        this.activePointersDist = curDiff;
       }
     };
     this.canvas.onpointerdown = handlePointerDown;
-    this.canvas.onpointerup = handlePointerUp;
     this.canvas.onpointermove = handlePointerMove;
+    this.canvas.onpointerup = handlePointerUp;
+    // Variations of pointerup
+    this.canvas.onpointerleave = handlePointerUp;
+    this.canvas.onpointercancel = handlePointerUp;
+    this.canvas.onpointerout = handlePointerUp;
 
     this.drawCanvas();
   }
@@ -124,27 +171,50 @@ export default class DrawingCanvas extends React.Component {
     // Clear the canvas
     this.ctx.fillStyle = "#2e2b26";
     this.ctx.fillRect(
+      -this.canvas.width,
+      -this.canvas.height,
+      this.canvas.width * 4,
+      this.canvas.height * 4
+    );
+
+    this.ctx.setTransform(
+      this.canvasProperties.zoom,
       0,
       0,
-      this.canvas.width * this.canvasProperties.zoom,
-      this.canvas.height * this.canvasProperties.zoom
+      this.canvasProperties.zoom,
+      (-(this.canvasProperties.zoom - 1) * this.canvas.width) / 2,
+      (-(this.canvasProperties.zoom - 1) * this.canvas.height) / 2
     );
 
     // Create paper
     this.withDropShadow(() => {
       this.ctx.fillStyle = "#fff";
       this.ctx.fillRect(
-        0 + this.canvasProperties.offset.x,
-        0 + this.canvasProperties.offset.y,
-        this.canvasProperties.width * this.canvasProperties.zoom,
-        this.canvasProperties.height * this.canvasProperties.zoom
+        0 + this.canvasProperties.offset.x - this.canvasProperties.width / 2,
+        0 + this.canvasProperties.offset.y - this.canvasProperties.height / 2,
+        this.canvasProperties.width,
+        this.canvasProperties.height
       );
     });
+
+    this.ctx.fillStyle = "#000";
+    this.ctx.fillRect(
+      0 + this.canvasProperties.offset.x,
+      0 + this.canvasProperties.offset.y,
+      20,
+      20
+    );
   }
 
-  canvasMove(x, y) {
-    this.canvasProperties.offset.x += x;
-    this.canvasProperties.offset.y += y;
+  canvasMove(dx, dy) {
+    this.canvasProperties.offset.x += dx / this.canvasProperties.zoom;
+    this.canvasProperties.offset.y += dy / this.canvasProperties.zoom;
+    this.drawCanvas();
+  }
+
+  canvasSetZoom(zoom) {
+    zoom = clamp(zoom, 0.1, 10);
+    this.canvasProperties.zoom = zoom;
     this.drawCanvas();
   }
 
@@ -260,7 +330,7 @@ export default class DrawingCanvas extends React.Component {
               onClick: () => {
                 let i = 0;
                 var inter = setInterval(() => {
-                  this.canvasSetZoom(this.canvasProperties.zoom + 0.005);
+                  this.canvasSetZoom(this.canvasProperties.zoom * 1.005);
                   i++;
                   if (i == 20) {
                     clearInterval(inter);
@@ -274,7 +344,7 @@ export default class DrawingCanvas extends React.Component {
               onClick: () => {
                 let i = 0;
                 var inter = setInterval(() => {
-                  this.canvasSetZoom(this.canvasProperties.zoom - 0.005);
+                  this.canvasSetZoom(this.canvasProperties.zoom / 1.005);
                   i++;
                   if (i == 20) {
                     clearInterval(inter);
