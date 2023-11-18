@@ -2,6 +2,14 @@
 import React from "react";
 import "../disableSwipeGesture.css";
 
+/**
+ * Clamp a value between a minimum and maximum bound.
+ *
+ * @param {number} x - The value to clamp.
+ * @param {number} a - The minimum bound.
+ * @param {number} b - The maximum bound.
+ * @returns {number} - The clamped value.
+ */
 const clamp = (x, a, b) => Math.max(a, Math.min(x, b));
 
 export default class DrawingCanvas extends React.Component {
@@ -11,8 +19,13 @@ export default class DrawingCanvas extends React.Component {
     this.state = {
       tool: "Pan",
       toolbarGrabbing: false,
+      /**
+       * Callback function for toolbar move event.
+       * @param {MouseEvent} e - The mouse event object.
+       */
       toolbarMoveListenerCb: (e) => {
         if (this.state.toolbarRelPos == null) {
+          // Update toolbarRelPos when it is null
           this.setState({
             toolbarRelPos: {
               x: this.state.toolbarPos.x - e.clientX,
@@ -20,6 +33,7 @@ export default class DrawingCanvas extends React.Component {
             },
           });
         } else {
+          // Update toolbarPos when toolbarRelPos is not null
           this.setState({
             toolbarPos: {
               x: e.clientX + this.state.toolbarRelPos.x,
@@ -28,6 +42,7 @@ export default class DrawingCanvas extends React.Component {
           });
         }
 
+        // Add mouseup event listener to remove the move and reset toolbar position
         document.addEventListener(
           "mouseup",
           () => {
@@ -52,6 +67,9 @@ export default class DrawingCanvas extends React.Component {
     };
   }
 
+  /**
+   * Initializes the drawing canvas and sets up event handlers.
+   */
   componentDidMount() {
     // Initialize the canvas
     this.canvas = document.getElementById("drawingCanvas");
@@ -72,19 +90,35 @@ export default class DrawingCanvas extends React.Component {
     this.pointersOldDist = -1;
     this.canvas.isdragging = false;
 
+    /**
+     * Handles the pointer down event.
+     * @param {Event} e - The pointer down event object.
+     */
     this.pointerDownHandler = (e) => {
       if (this.state.tool == "Pan") this.canvas.isdragging = true;
       this.pointersList.push(e);
     };
+    /**
+     * Handles the pointer up event.
+     * @param {Event} e - The pointer up event object.
+     */
     this.pointerUpHandler = (e) => {
-      if (this.state.tool == "Pan") this.canvas.isdragging = false;
+      if (this.state.tool === "Pan") {
+        this.canvas.isdragging = false;
+      }
 
-      // Remove the pointer from the list
+      // Find the index of the pointer in the pointersList
       const index = this.pointersList.findIndex(
-        (p) => p.pointerId == e.pointerId
+        (p) => p.pointerId === e.pointerId
       );
+
+      // Remove the pointer from the pointersList
       this.pointersList.splice(index, 1);
     };
+    /**
+     * Handles the pointer move event.
+     * @param {Event} e - The pointer move event object.
+     */
     this.pointerMoveHandler = (e) => {
       // Update the pointer ID inside the list
       const index = this.pointersList.findIndex(
@@ -100,17 +134,19 @@ export default class DrawingCanvas extends React.Component {
       }
       // Check if there are 2 active pointers
       else if (this.pointersList.length == 2) {
-        const distance = Math.hypot(
-          this.pointersList[0].x - this.pointersList[1].x,
-          this.pointersList[0].y - this.pointersList[1].y
-        );
+        if (this.canvas.isdragging) {
+          const distance = Math.hypot(
+            this.pointersList[0].x - this.pointersList[1].x,
+            this.pointersList[0].y - this.pointersList[1].y
+          );
 
-        if (this.pointersOldDist < distance) {
-          this.canvasSetZoom(this.canvasProperties.zoom + 0.008);
-        } else if (this.pointersOldDist > distance) {
-          this.canvasSetZoom(this.canvasProperties.zoom - 0.008);
+          if (this.pointersOldDist < distance) {
+            this.canvasSetZoom(this.canvasProperties.zoom + 0.008);
+          } else if (this.pointersOldDist > distance) {
+            this.canvasSetZoom(this.canvasProperties.zoom - 0.008);
+          }
+          this.pointersOldDist = distance;
         }
-        this.pointersOldDist = distance;
       }
     };
     this.canvas.onpointermove = this.pointerMoveHandler;
@@ -124,69 +160,103 @@ export default class DrawingCanvas extends React.Component {
     this.draw();
   }
 
-  // Update the canvas
+  /**
+   * Updates the canvas by redrawing its contents.
+   */
   draw() {
+    // Set the transformation matrix
     this.ctx.setTransform(
-      this.canvasProperties.zoom,
-      0,
-      0,
-      this.canvasProperties.zoom,
-      this.canvasProperties.offset.x,
-      this.canvasProperties.offset.y
+      this.canvasProperties.zoom, // scale x
+      0, // shear y
+      0, // shear x
+      this.canvasProperties.zoom, // scale y
+      this.canvasProperties.offset.x, // translate x
+      this.canvasProperties.offset.y // translate y
     );
 
     // Clear the canvas
-    this.ctx.fillStyle = "#2e2b26";
+    this.ctx.fillStyle = "#2e2b26"; // set fill color to dark gray
     this.ctx.fillRect(
-      0 - this.canvasProperties.offset.x / this.canvasProperties.zoom,
-      0 - this.canvasProperties.offset.y / this.canvasProperties.zoom,
-      this.canvas.width / this.canvasProperties.zoom,
-      this.canvas.height / this.canvasProperties.zoom
+      0 - this.canvasProperties.offset.x / this.canvasProperties.zoom, // x coordinate of top-left corner
+      0 - this.canvasProperties.offset.y / this.canvasProperties.zoom, // y coordinate of top-left corner
+      this.canvas.width / this.canvasProperties.zoom, // width of rectangle
+      this.canvas.height / this.canvasProperties.zoom // height of rectangle
     );
 
     // Redraw the canvas paper
-    this.ctx.fillStyle = "white";
+    this.ctx.fillStyle = "white"; // set fill color to white
     this.withDropShadow(() => {
       this.ctx.fillRect(
         (this.canvas.width / 2 - this.canvasProperties.width / 2) /
-          this.canvasProperties.zoom,
+          this.canvasProperties.zoom, // x coordinate of top-left corner
         (this.canvas.height / 2 - this.canvasProperties.height / 2) /
-          this.canvasProperties.zoom,
-        this.canvasProperties.width,
-        this.canvasProperties.height
+          this.canvasProperties.zoom, // y coordinate of top-left corner
+        this.canvasProperties.width, // width of rectangle
+        this.canvasProperties.height // height of rectangle
       );
     });
   }
 
+  /**
+   * Moves the canvas by the given x and y coordinates.
+   *
+   * @param {number} x - The amount to move the canvas horizontally.
+   * @param {number} y - The amount to move the canvas vertically.
+   */
   canvasMove(x, y) {
+    // Update the x and y offset of the canvas properties
     this.canvasProperties.offset.x += x;
     this.canvasProperties.offset.y += y;
+
+    // Redraw the canvas
     this.draw();
   }
 
+  /**
+   * Set the zoom level of the canvas.
+   * @param {number} zoom - The new zoom level.
+   */
   canvasSetZoom(zoom) {
+    // Clamp the zoom value between 0.1 and 4.
     zoom = clamp(zoom, 0.1, 4);
+
+    // Calculate the difference in zoom levels.
     const deltaZoom = zoom - this.canvasProperties.zoom;
+
+    // Update the zoom level.
     this.canvasProperties.zoom = zoom;
 
+    // Adjust the offset based on the zoom level change.
     this.canvasProperties.offset.x +=
       (-deltaZoom * this.canvasProperties.width) / 2;
     this.canvasProperties.offset.y +=
       (-deltaZoom * this.canvasProperties.height) / 2;
 
+    // Redraw the canvas.
     this.draw();
   }
 
+  /**
+   * Draw something with a drop shadow effect.
+   * @param {function} cb - The function that draws an object.
+   */
   withDropShadow(cb) {
+    // Save the original shadow properties
     const originalShadowColor = this.ctx.shadowColor;
     const originalShadowBlur = this.ctx.shadowBlur;
     const originalShadowOffsetX = this.ctx.shadowOffsetX;
     const originalShadowOffsetY = this.ctx.shadowOffsetY;
+
+    // Set the new shadow properties
     this.ctx.shadowColor = "#0002";
     this.ctx.shadowBlur = 10;
     this.ctx.shadowOffsetX = 5;
     this.ctx.shadowOffsetY = 5;
+
+    // Execute the callback function
     cb();
+
+    // Restore the original shadow properties
     this.ctx.shadowColor = originalShadowColor;
     this.ctx.shadowBlur = originalShadowBlur;
     this.ctx.shadowOffsetX = originalShadowOffsetX;
