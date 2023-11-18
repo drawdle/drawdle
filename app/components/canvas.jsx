@@ -89,13 +89,33 @@ export default class DrawingCanvas extends React.Component {
     this.pointersList = [];
     this.pointersOldDist = -1;
     this.canvas.isdragging = false;
+    this.lines = [
+      [
+        { x: 0, y: 0 },
+        { x: 1, y: 2 },
+        { x: 30, y: 40 },
+      ],
+    ];
 
     /**
      * Handles the pointer down event.
      * @param {Event} e - The pointer down event object.
      */
     this.pointerDownHandler = (e) => {
-      if (this.state.tool == "Pan") this.canvas.isdragging = true;
+      if (this.state.tool == "Pan") {
+        this.canvas.isdragging = true;
+      } else if (this.state.tool == "Draw") {
+        this.canvas.isdrawing = true;
+        this.lines.push([]);
+
+        this.lines[this.lines.length - 1].push({
+          x: (e.clientX - this.canvas.width / 2) / this.canvasProperties.zoom,
+          y:
+            (e.clientY - 64 - this.canvas.height / 2) /
+            this.canvasProperties.zoom,
+        });
+        this.draw();
+      }
       this.pointersList.push(e);
     };
     /**
@@ -105,6 +125,8 @@ export default class DrawingCanvas extends React.Component {
     this.pointerUpHandler = (e) => {
       if (this.state.tool === "Pan") {
         this.canvas.isdragging = false;
+      } else if (this.state.tool == "Draw") {
+        this.canvas.isdrawing = false;
       }
 
       // Find the index of the pointer in the pointersList
@@ -130,23 +152,29 @@ export default class DrawingCanvas extends React.Component {
       if (this.pointersList.length == 1) {
         if (this.canvas.isdragging) {
           this.canvasMove(e.movementX, e.movementY);
+        } else if (this.canvas.isdrawing) {
+          this.lines[this.lines.length - 1].push({
+            x: (e.clientX - this.canvas.width / 2) / this.canvasProperties.zoom,
+            y:
+              (e.clientY - 64 - this.canvas.height / 2) /
+              this.canvasProperties.zoom,
+          });
+          this.draw();
         }
       }
       // Check if there are 2 active pointers
       else if (this.pointersList.length == 2) {
-        if (this.canvas.isdragging) {
-          const distance = Math.hypot(
-            this.pointersList[0].x - this.pointersList[1].x,
-            this.pointersList[0].y - this.pointersList[1].y
-          );
+        const distance = Math.hypot(
+          this.pointersList[0].x - this.pointersList[1].x,
+          this.pointersList[0].y - this.pointersList[1].y
+        );
 
-          if (this.pointersOldDist < distance) {
-            this.canvasSetZoom(this.canvasProperties.zoom + 0.008);
-          } else if (this.pointersOldDist > distance) {
-            this.canvasSetZoom(this.canvasProperties.zoom - 0.008);
-          }
-          this.pointersOldDist = distance;
+        if (this.pointersOldDist < distance) {
+          this.canvasSetZoom(this.canvasProperties.zoom + 0.008);
+        } else if (this.pointersOldDist > distance) {
+          this.canvasSetZoom(this.canvasProperties.zoom - 0.008);
         }
+        this.pointersOldDist = distance;
       }
     };
     this.canvas.onpointermove = this.pointerMoveHandler;
@@ -187,13 +215,25 @@ export default class DrawingCanvas extends React.Component {
     this.ctx.fillStyle = "white"; // set fill color to white
     this.withDropShadow(() => {
       this.ctx.fillRect(
-        (this.canvas.width / 2 - this.canvasProperties.width / 2) /
-          this.canvasProperties.zoom, // x coordinate of top-left corner
-        (this.canvas.height / 2 - this.canvasProperties.height / 2) /
-          this.canvasProperties.zoom, // y coordinate of top-left corner
+        this.canvas.width / 2 - this.canvasProperties.width / 2, // x coordinate of top-left corner
+        this.canvas.height / 2 - this.canvasProperties.height / 2, // y coordinate of top-left corner
         this.canvasProperties.width, // width of rectangle
         this.canvasProperties.height // height of rectangle
       );
+    });
+
+    this.ctx.fillRect(0, 0, 20, 20);
+
+    // Redraw the lines
+    const cx = this.canvas.width / 2;
+    const cy = this.canvas.height / 2;
+    this.lines.forEach((line) => {
+      this.ctx.beginPath();
+      this.ctx.moveTo(line[0].x + cx, line[0].y + cy);
+      for (let i = 1; i < line.length; i++) {
+        this.ctx.lineTo(line[i].x + cx, line[i].y + cy);
+      }
+      this.ctx.stroke();
     });
   }
 
@@ -227,10 +267,8 @@ export default class DrawingCanvas extends React.Component {
     this.canvasProperties.zoom = zoom;
 
     // Adjust the offset based on the zoom level change.
-    this.canvasProperties.offset.x +=
-      (-deltaZoom * this.canvasProperties.width) / 2;
-    this.canvasProperties.offset.y +=
-      (-deltaZoom * this.canvasProperties.height) / 2;
+    this.canvasProperties.offset.x -= deltaZoom * (this.canvas.width / 2);
+    this.canvasProperties.offset.y -= deltaZoom * (this.canvas.height / 2);
 
     // Redraw the canvas.
     this.draw();
