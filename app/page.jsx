@@ -7,7 +7,7 @@ export default function Home() {
     <>
       <NavBar />
       <main className="flex min-h-screen flex-col items-center justify-between bg-beige-800">
-        <div className="bg-beige-400 h-[70vh] w-full flex items-center justify-center flex-col">
+        <div className="bg-beige-500 h-[70vh] w-full flex items-center justify-center flex-col">
           <p className="text-5xl text-beige-900">Draw-dle</p>
           <p className="text-beige-700">Learn to draw by completing doodles</p>
           <Link href={"/draw"}>
