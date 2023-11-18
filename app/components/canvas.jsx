@@ -76,6 +76,11 @@ export default class DrawingCanvas extends React.Component {
     this.ctx = this.canvas.getContext("2d");
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight - 64;
+    document.addEventListener("resize", () => {
+      this.canvas.width = window.innerWidth;
+      this.canvas.height = window.innerHeight - 64;
+      this.drawCanvas();
+    });
     this.canvasProperties = {
       width: 720,
       height: 480,
@@ -85,191 +90,64 @@ export default class DrawingCanvas extends React.Component {
         y: 0,
       },
     };
+    this.canvasProperties.offset = {
+      x: this.canvas.width / 2 - this.canvasProperties.width / 2,
+      y: this.canvas.height / 2 - this.canvasProperties.height / 2,
+    };
 
-    this.pointersList = [];
-    this.pointersOldDist = -1;
-    this.canvas.isdragging = false;
-    this.lines = [];
-
-    /**
-     * Handles the pointer down event.
-     * @param {Event} e - The pointer down event object.
-     */
-    this.pointerDownHandler = (e) => {
+    // Add event listeners
+    const handlePointerDown = (e) => {
       if (this.state.tool == "Pan") {
-        this.canvas.isdragging = true;
-      } else if (this.state.tool == "Draw") {
-        this.canvas.isdrawing = true;
-        this.lines.push([]);
-
-        this.lines[this.lines.length - 1].push({
-          x: (e.clientX - this.canvas.width / 2) / this.canvasProperties.zoom,
-          y:
-            (e.clientY - 64 - this.canvas.height / 2) /
-            this.canvasProperties.zoom,
-        });
-        this.draw();
+        this.canvas.isgrabbing = true;
       }
-      this.pointersList.push(e);
     };
-    /**
-     * Handles the pointer up event.
-     * @param {Event} e - The pointer up event object.
-     */
-    this.pointerUpHandler = (e) => {
-      if (this.state.tool === "Pan") {
-        this.canvas.isdragging = false;
-      } else if (this.state.tool == "Draw") {
-        this.canvas.isdrawing = false;
+    const handlePointerUp = (e) => {
+      if (this.state.tool == "Pan") {
+        this.canvas.isgrabbing = false;
       }
-
-      // Find the index of the pointer in the pointersList
-      const index = this.pointersList.findIndex(
-        (p) => p.pointerId === e.pointerId
-      );
-
-      // Remove the pointer from the pointersList
-      this.pointersList.splice(index, 1);
     };
-    /**
-     * Handles the pointer move event.
-     * @param {Event} e - The pointer move event object.
-     */
-    this.pointerMoveHandler = (e) => {
-      // Update the pointer ID inside the list
-      const index = this.pointersList.findIndex(
-        (p) => p.pointerId == e.pointerId
-      );
-      this.pointersList[index] = e;
-
-      // Check if there is only 1 active pointer
-      if (this.pointersList.length == 1) {
-        if (this.canvas.isdragging) {
+    const handlePointerMove = (e) => {
+      if (this.state.tool == "Pan") {
+        if (this.canvas.isgrabbing) {
           this.canvasMove(e.movementX, e.movementY);
-        } else if (this.canvas.isdrawing) {
-          this.lines[this.lines.length - 1].push({
-            x: (e.clientX - this.canvas.width / 2) / this.canvasProperties.zoom,
-            y:
-              (e.clientY - 64 - this.canvas.height / 2) /
-              this.canvasProperties.zoom,
-          });
-          this.draw();
         }
-      }
-      // Check if there are 2 active pointers
-      else if (this.pointersList.length == 2) {
-        const distance = Math.hypot(
-          this.pointersList[0].x - this.pointersList[1].x,
-          this.pointersList[0].y - this.pointersList[1].y
-        );
-
-        if (this.pointersOldDist < distance) {
-          this.canvasSetZoom(this.canvasProperties.zoom + 0.008);
-        } else if (this.pointersOldDist > distance) {
-          this.canvasSetZoom(this.canvasProperties.zoom - 0.008);
-        }
-        this.pointersOldDist = distance;
       }
     };
-    this.canvas.onpointermove = this.pointerMoveHandler;
-    this.canvas.onpointerdown = this.pointerDownHandler;
-    // All the same thing (pretty much)
-    this.canvas.onpointerup = this.pointerUpHandler;
-    this.canvas.onpointerleave = this.pointerUpHandler;
-    this.canvas.onpointerout = this.pointerUpHandler;
-    this.canvas.onpointercancel = this.pointerUpHandler;
+    this.canvas.onpointerdown = handlePointerDown;
+    this.canvas.onpointerup = handlePointerUp;
+    this.canvas.onpointermove = handlePointerMove;
 
-    this.draw();
+    this.drawCanvas();
   }
 
-  /**
-   * Updates the canvas by redrawing its contents.
-   */
-  draw() {
-    // Set the transformation matrix
-    this.ctx.setTransform(
-      this.canvasProperties.zoom, // scale x
-      0, // shear y
-      0, // shear x
-      this.canvasProperties.zoom, // scale y
-      this.canvasProperties.offset.x, // translate x
-      this.canvasProperties.offset.y // translate y
-    );
-
+  drawCanvas() {
     // Clear the canvas
-    this.ctx.fillStyle = "#2e2b26"; // set fill color to dark gray
+    this.ctx.fillStyle = "#2e2b26";
     this.ctx.fillRect(
-      0 - this.canvasProperties.offset.x / this.canvasProperties.zoom, // x coordinate of top-left corner
-      0 - this.canvasProperties.offset.y / this.canvasProperties.zoom, // y coordinate of top-left corner
-      this.canvas.width / this.canvasProperties.zoom, // width of rectangle
-      this.canvas.height / this.canvasProperties.zoom // height of rectangle
+      0,
+      0,
+      this.canvas.width * this.canvasProperties.zoom,
+      this.canvas.height * this.canvasProperties.zoom
     );
 
-    // Redraw the canvas paper
-    this.ctx.fillStyle = "white"; // set fill color to white
+    // Create paper
     this.withDropShadow(() => {
+      this.ctx.fillStyle = "#fff";
       this.ctx.fillRect(
-        this.canvas.width / 2 - this.canvasProperties.width / 2, // x coordinate of top-left corner
-        this.canvas.height / 2 - this.canvasProperties.height / 2, // y coordinate of top-left corner
-        this.canvasProperties.width, // width of rectangle
-        this.canvasProperties.height // height of rectangle
+        0 + this.canvasProperties.offset.x,
+        0 + this.canvasProperties.offset.y,
+        this.canvasProperties.width * this.canvasProperties.zoom,
+        this.canvasProperties.height * this.canvasProperties.zoom
       );
     });
-
-    // Redraw the lines
-    const cx = this.canvas.width / 2;
-    const cy = this.canvas.height / 2;
-    this.lines.forEach((line) => {
-      this.ctx.beginPath();
-      this.ctx.moveTo(line[0].x + cx, line[0].y + cy);
-      for (let i = 1; i < line.length; i++) {
-        this.ctx.lineTo(line[i].x + cx, line[i].y + cy);
-      }
-      this.ctx.stroke();
-    });
   }
 
-  /**
-   * Moves the canvas by the given x and y coordinates.
-   *
-   * @param {number} x - The amount to move the canvas horizontally.
-   * @param {number} y - The amount to move the canvas vertically.
-   */
   canvasMove(x, y) {
-    // Update the x and y offset of the canvas properties
     this.canvasProperties.offset.x += x;
     this.canvasProperties.offset.y += y;
-
-    // Redraw the canvas
-    this.draw();
+    this.drawCanvas();
   }
 
-  /**
-   * Set the zoom level of the canvas.
-   * @param {number} zoom - The new zoom level.
-   */
-  canvasSetZoom(zoom) {
-    // Clamp the zoom value between 0.1 and 4.
-    zoom = clamp(zoom, 0.1, 4);
-
-    // Calculate the difference in zoom levels.
-    const deltaZoom = zoom - this.canvasProperties.zoom;
-
-    // Update the zoom level.
-    this.canvasProperties.zoom = zoom;
-
-    // Adjust the offset based on the zoom level change.
-    this.canvasProperties.offset.x -= deltaZoom * (this.canvas.width / 2);
-    this.canvasProperties.offset.y -= deltaZoom * (this.canvas.height / 2);
-
-    // Redraw the canvas.
-    this.draw();
-  }
-
-  /**
-   * Draw something with a drop shadow effect.
-   * @param {function} cb - The function that draws an object.
-   */
   withDropShadow(cb) {
     // Save the original shadow properties
     const originalShadowColor = this.ctx.shadowColor;
