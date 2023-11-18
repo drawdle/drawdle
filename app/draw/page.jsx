@@ -9,7 +9,7 @@ export default class Draw extends React.Component {
       window.history.pushState({}, "", "/draw");
       document.getElementById("canvasContainer").style.opacity = "0";
       document.getElementById("canvasContainer").style.transition =
-        "opacity 1000ms ease-out";
+        "opacity 450ms ease-in-out";
     }
     setTimeout(() => {
       document.getElementById("canvasContainer").style.opacity = "";
