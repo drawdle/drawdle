@@ -53,6 +53,7 @@ export default class DrawingCanvas extends React.Component {
   }
 
   componentDidMount() {
+    // Initialize the canvas
     this.canvas = document.getElementById("drawingCanvas");
     this.ctx = this.canvas.getContext("2d");
     this.canvas.width = window.innerWidth;
@@ -67,35 +68,90 @@ export default class DrawingCanvas extends React.Component {
       },
     };
 
-    // https://codepen.io/chengarda/pen/wRxoyB
-    this.canvas.onpointerdown = (e) => {
-      this.canvas.isdragging = true;
+    this.pointersList = [];
+    this.pointersOldDist = -1;
+    this.canvas.isdragging = false;
+
+    this.pointerDownHandler = (e) => {
+      if (this.state.tool == "Pan") this.canvas.isdragging = true;
+      this.pointersList.push(e);
     };
-    this.canvas.onpointerup = (e) => {
-      this.canvas.isdragging = false;
+    this.pointerUpHandler = (e) => {
+      if (this.state.tool == "Pan") this.canvas.isdragging = false;
+
+      // Remove the pointer from the list
+      const index = this.pointersList.findIndex(
+        (p) => p.pointerId == e.pointerId
+      );
+      this.pointersList.splice(index, 1);
     };
-    this.canvas.onpointermove = (e) => {
-      if (this.state.tool == "Pan" && this.canvas.isdragging) {
-        this.canvasMove(e.movementX, e.movementY);
+    this.pointerMoveHandler = (e) => {
+      // Update the pointer ID inside the list
+      const index = this.pointersList.findIndex(
+        (p) => p.pointerId == e.pointerId
+      );
+      this.pointersList[index] = e;
+
+      // Check if there is only 1 active pointer
+      if (this.pointersList.length == 1) {
+        if (this.canvas.isdragging) {
+          this.canvasMove(e.movementX, e.movementY);
+        }
+      }
+      // Check if there are 2 active pointers
+      else if (this.pointersList.length == 2) {
+        const distance = Math.hypot(
+          this.pointersList[0].x - this.pointersList[1].x,
+          this.pointersList[0].y - this.pointersList[1].y
+        );
+
+        if (this.pointersOldDist < distance) {
+          this.canvasSetZoom(this.canvasProperties.zoom + 0.01);
+        } else if (this.pointersOldDist > distance) {
+          this.canvasSetZoom(this.canvasProperties.zoom - 0.01);
+        }
+        this.pointersOldDist = distance;
       }
     };
+    this.canvas.onpointermove = this.pointerMoveHandler;
+    this.canvas.onpointerdown = this.pointerDownHandler;
+    // All the same thing (pretty much)
+    this.canvas.onpointerup = this.pointerUpHandler;
+    this.canvas.onpointerleave = this.pointerUpHandler;
+    this.canvas.onpointerout = this.pointerUpHandler;
+    this.canvas.onpointercancel = this.pointerUpHandler;
 
     this.draw();
   }
 
+  // Update the canvas
   draw() {
+    this.ctx.setTransform(
+      this.canvasProperties.zoom,
+      0,
+      0,
+      this.canvasProperties.zoom,
+      this.canvasProperties.offset.x,
+      this.canvasProperties.offset.y
+    );
+
+    // Clear the canvas
     this.ctx.fillStyle = "#2e2b26";
     this.ctx.fillRect(
-      0 - this.canvasProperties.offset.x,
-      0 - this.canvasProperties.offset.y,
-      this.canvas.width,
-      this.canvas.height
+      0 - this.canvasProperties.offset.x / this.canvasProperties.zoom,
+      0 - this.canvasProperties.offset.y / this.canvasProperties.zoom,
+      this.canvas.width / this.canvasProperties.zoom,
+      this.canvas.height / this.canvasProperties.zoom
     );
+
+    // Redraw the canvas paper
     this.ctx.fillStyle = "white";
     this.withDropShadow(() => {
       this.ctx.fillRect(
-        this.canvas.width / 2 - this.canvasProperties.width / 2,
-        this.canvas.height / 2 - this.canvasProperties.height / 2,
+        (this.canvas.width / 2 - this.canvasProperties.width / 2) /
+          this.canvasProperties.zoom,
+        (this.canvas.height / 2 - this.canvasProperties.height / 2) /
+          this.canvasProperties.zoom,
         this.canvasProperties.width,
         this.canvasProperties.height
       );
@@ -105,13 +161,20 @@ export default class DrawingCanvas extends React.Component {
   canvasMove(x, y) {
     this.canvasProperties.offset.x += x;
     this.canvasProperties.offset.y += y;
-    this.ctx.translate(x, y);
+    console.log(this.canvasProperties.offset.x, this.canvasProperties.offset.y);
     this.draw();
   }
 
   canvasSetZoom(zoom) {
+    zoom = clamp(zoom, 0.1, 4);
+    const deltaZoom = zoom - this.canvasProperties.zoom;
     this.canvasProperties.zoom = zoom;
-    this.ctx.scale(zoom, zoom);
+
+    this.canvasProperties.offset.x +=
+      (-deltaZoom * this.canvasProperties.width) / 2;
+    this.canvasProperties.offset.y +=
+      (-deltaZoom * this.canvasProperties.height) / 2;
+
     this.draw();
   }
 
