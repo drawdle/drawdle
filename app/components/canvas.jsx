@@ -259,14 +259,6 @@ export default class DrawingCanvas extends React.Component {
               text: "Line",
               icon: "bi-slash-lg",
             },
-            {
-              text: "Zoom",
-              icon: "bi-zoom-in",
-            },
-            {
-              text: "Zoom out",
-              icon: "bi-zoom-out",
-            },
           ].map((e, i) => (
             <button
               key={i}
@@ -278,6 +270,45 @@ export default class DrawingCanvas extends React.Component {
               onClick={() => {
                 this.setState({ tool: e.text });
               }}
+            >
+              <i className={e.icon}></i>
+            </button>
+          ))}
+          <div className="border-l border-beige-700 h-8 w-0"></div>
+          {[
+            {
+              text: "Zoom",
+              icon: "bi-zoom-in",
+              onClick: () => {
+                let i = 0;
+                var inter = setInterval(() => {
+                  this.canvasSetZoom(this.canvasProperties.zoom + 0.005);
+                  i++;
+                  if (i == 20) {
+                    clearInterval(inter);
+                  }
+                });
+              },
+            },
+            {
+              text: "Zoom out",
+              icon: "bi-zoom-out",
+              onClick: () => {
+                let i = 0;
+                var inter = setInterval(() => {
+                  this.canvasSetZoom(this.canvasProperties.zoom - 0.005);
+                  i++;
+                  if (i == 20) {
+                    clearInterval(inter);
+                  }
+                });
+              },
+            },
+          ].map((e, i) => (
+            <button
+              key={i}
+              className={"w-8 h-8 hover:bg-[#fff4] rounded"}
+              onClick={e.onClick}
             >
               <i className={e.icon}></i>
             </button>
