@@ -89,13 +89,7 @@ export default class DrawingCanvas extends React.Component {
     this.pointersList = [];
     this.pointersOldDist = -1;
     this.canvas.isdragging = false;
-    this.lines = [
-      [
-        { x: 0, y: 0 },
-        { x: 1, y: 2 },
-        { x: 30, y: 40 },
-      ],
-    ];
+    this.lines = [];
 
     /**
      * Handles the pointer down event.
@@ -221,8 +215,6 @@ export default class DrawingCanvas extends React.Component {
         this.canvasProperties.height // height of rectangle
       );
     });
-
-    this.ctx.fillRect(0, 0, 20, 20);
 
     // Redraw the lines
     const cx = this.canvas.width / 2;
