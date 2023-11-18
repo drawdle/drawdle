@@ -67,7 +67,7 @@ export default class DrawingCanvas extends React.Component {
     this.ctx = this.canvas.getContext("2d");
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight - 64;
-    document.addEventListener("resize", () => {
+    window.addEventListener("resize", () => {
       this.canvas.width = window.innerWidth;
       this.canvas.height = window.innerHeight - 64;
       this.drawCanvas();
