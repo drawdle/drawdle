@@ -106,9 +106,9 @@ export default class DrawingCanvas extends React.Component {
         );
 
         if (this.pointersOldDist < distance) {
-          this.canvasSetZoom(this.canvasProperties.zoom + 0.01);
+          this.canvasSetZoom(this.canvasProperties.zoom + 0.002);
         } else if (this.pointersOldDist > distance) {
-          this.canvasSetZoom(this.canvasProperties.zoom - 0.01);
+          this.canvasSetZoom(this.canvasProperties.zoom - 0.002);
         }
         this.pointersOldDist = distance;
       }
@@ -161,7 +161,6 @@ export default class DrawingCanvas extends React.Component {
   canvasMove(x, y) {
     this.canvasProperties.offset.x += x;
     this.canvasProperties.offset.y += y;
-    console.log(this.canvasProperties.offset.x, this.canvasProperties.offset.y);
     this.draw();
   }
 
