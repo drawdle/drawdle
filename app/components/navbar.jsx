@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export function NavBar() {
   return (
-    <div className="fixed top-0 left-0 w-[100vw] items-center h-16 bg-beige-400 flex gap-1 px-4 text-beige-800">
+    <div className="fixed top-0 left-0 w-[100vw] items-center h-16 bg-beige-400 flex gap-1 px-4 text-beige-800 z-50">
       {[
         {
           link: "/draw",
