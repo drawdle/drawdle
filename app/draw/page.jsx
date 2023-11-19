@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
-import DrawingCanvas from "../../src/components/canvas";
-import { NavBar } from "../../src/components/navbar";
+import DrawingCanvas from "../components/canvas";
+import { NavBar } from "../components/navbar";
 
 export default class Draw extends React.Component {
   componentDidMount() {
