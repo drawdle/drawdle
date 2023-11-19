@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { createRef } from "react";
 import "../disableSwipeGesture.css";
 import { clamp, mean } from "../utils/math";
 
@@ -19,8 +19,12 @@ export default class DrawingCanvas extends React.Component {
           // Update toolbarRelPos when it is null
           this.setState({
             toolbarRelPos: {
-              x: this.state.toolbarPos.x - e.clientX,
-              y: this.state.toolbarPos.y - e.clientY,
+              x:
+                this.state.toolbarRef.current.style.left.replace("px", "") -
+                e.clientX,
+              y:
+                this.state.toolbarRef.current.style.top.replace("px", "") -
+                e.clientY,
             },
           });
         } else {
@@ -31,6 +35,7 @@ export default class DrawingCanvas extends React.Component {
               y: e.clientY + this.state.toolbarRelPos.y,
             },
           });
+          console.log(this.state.toolbarRelPos, this.state.toolbarPos);
         }
 
         // Add mouseup event listener to remove the move and reset toolbar position
@@ -55,6 +60,7 @@ export default class DrawingCanvas extends React.Component {
       },
       toolbarRelPos: null,
       toolbarPos: { x: 8, y: 74 },
+      toolbarRef: createRef(),
     };
   }
 
@@ -68,6 +74,12 @@ export default class DrawingCanvas extends React.Component {
     this.canvas.width = window.innerWidth;
     this.canvas.height = window.innerHeight - 64;
     window.addEventListener("resize", () => {
+      // Update toolbar position
+      this.state.toolbarRef.current.style.top =
+        clamp(this.state.toolbarPos.y, 68, window.innerHeight - 52) + "px";
+      this.state.toolbarRef.current.style.left =
+        clamp(this.state.toolbarPos.x, 4, window.innerWidth - 257) + "px";
+
       this.canvas.width = window.innerWidth;
       this.canvas.height = window.innerHeight - 64;
       this.drawCanvas();
@@ -306,11 +318,12 @@ export default class DrawingCanvas extends React.Component {
         ></canvas>
         <div
           id="toolbar"
-          className="flex justify-start items-center p-2 bg-beige-800 fixed text-beige-200 rounded-md gap-1"
+          className="flex justify-start items-center p-2 bg-beige-800 fixed text-beige-200 rounded-md gap-1 shadow-md"
           style={{
-            top: clamp(this.state.toolbarPos.y, 68, window.innerHeight - 52),
-            left: clamp(this.state.toolbarPos.x, 4, window.innerWidth - 144),
+            top: clamp(this.state.toolbarPos.y, 68, window.innerHeight - 52), // 48 + 4
+            left: clamp(this.state.toolbarPos.x, 4, window.innerWidth - 257), // 253 + 4
           }}
+          ref={this.state.toolbarRef}
         >
           <div
             className={
@@ -318,12 +331,6 @@ export default class DrawingCanvas extends React.Component {
               " select-none"
             }
             onMouseDown={(e) => {
-              this.setState({
-                toolbarRelPos: {
-                  x: this.state.toolbarPos.x - e.clientX,
-                  y: this.state.toolbarPos.y - e.clientY,
-                },
-              });
               this.setState({ toolbarGrabbing: true });
               this.setState({
                 toolbarMoveListener: document.addEventListener(
