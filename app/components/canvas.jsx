@@ -91,9 +91,21 @@ export default class DrawingCanvas extends React.Component {
     this.activePointersDist = -1;
 
     // Add event listeners
+    document.addEventListener(
+      "wheel",
+      (e) => {
+        e.preventDefault();
+        if (e.ctrlKey) {
+          this.canvasSetZoom(this.canvasProperties.zoom * (1 - e.deltaY / 300));
+        } else {
+          this.canvasMove(-e.deltaX / 2, -e.deltaY / 2);
+        }
+      },
+      { passive: false }
+    );
     const handlePointerDown = (e) => {
       this.activePointers.push(e);
-      if (this.state.tool == "Pan") {
+      if (this.state.tool == "Pan" || this.canvas.isSpacePressed) {
         this.canvas.isgrabbing = true;
       }
     };
@@ -102,7 +114,7 @@ export default class DrawingCanvas extends React.Component {
         (p) => p.pointerId === e.pointerId
       );
       this.activePointers.splice(index, 1);
-      if (this.state.tool == "Pan") {
+      if (this.state.tool == "Pan" || this.canvas.isSpacePressed) {
         this.canvas.isgrabbing = false;
       }
     };
@@ -116,7 +128,7 @@ export default class DrawingCanvas extends React.Component {
       this.activePointers[index] = e;
 
       if (this.activePointers.length == 1) {
-        if (this.state.tool == "Pan") {
+        if (this.state.tool == "Pan" || this.canvas.isSpacePressed) {
           if (this.canvas.isgrabbing) {
             this.canvasMove(e.movementX, e.movementY);
           }
@@ -163,6 +175,46 @@ export default class DrawingCanvas extends React.Component {
     this.canvas.onpointerleave = handlePointerUp;
     this.canvas.onpointercancel = handlePointerUp;
     this.canvas.onpointerout = handlePointerUp;
+
+    // ctrl -/+ shortcut for zoom
+    // space for pan
+    this.canvas.isSpacePressed = false;
+    document.addEventListener("keydown", (e) => {
+      if (e.ctrlKey) {
+        if (e.key == "=") {
+          e.preventDefault();
+          let i = 0;
+          var inter = setInterval(() => {
+            this.canvasSetZoom(this.canvasProperties.zoom * 1.005);
+            i++;
+            if (i == 20) {
+              clearInterval(inter);
+            }
+          });
+        }
+        if (e.key == "-") {
+          e.preventDefault();
+          let i = 0;
+          var inter = setInterval(() => {
+            this.canvasSetZoom(this.canvasProperties.zoom / 1.005);
+            i++;
+            if (i == 20) {
+              clearInterval(inter);
+            }
+          });
+        }
+      }
+      if (e.keyCode == 32) {
+        // space is code 32
+        this.canvas.isSpacePressed = true;
+      }
+    });
+    document.addEventListener("keyup", (e) => {
+      if (e.keyCode == 32) {
+        //space is code 32
+        this.canvas.isSpacePressed = false;
+      }
+    });
 
     this.drawCanvas();
   }
