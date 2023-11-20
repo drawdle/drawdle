@@ -102,6 +102,9 @@ export default class DrawingCanvas extends React.Component {
     this.activePointers = [];
     this.activePointersDist = -1;
 
+    // Keep track of drawn lines
+    this.lines = [];
+
     // Add event listeners
     document.addEventListener(
       "wheel",
@@ -118,7 +121,15 @@ export default class DrawingCanvas extends React.Component {
     const handlePointerDown = (e) => {
       this.activePointers.push(e);
       if (this.state.tool == "Pan" || this.canvas.isSpacePressed) {
-        this.canvas.isgrabbing = true;
+        this.canvas.isGrabbing = true;
+      } else if (this.state.tool == "Draw") {
+        this.canvas.isDrawing = true;
+        this.lines.push([
+          {
+            x: e.clientX,
+            y: e.clientY - 64,
+          },
+        ]);
       }
     };
     const handlePointerUp = (e) => {
@@ -127,7 +138,7 @@ export default class DrawingCanvas extends React.Component {
       );
       this.activePointers.splice(index, 1);
       if (this.state.tool == "Pan" || this.canvas.isSpacePressed) {
-        this.canvas.isgrabbing = false;
+        this.canvas.isGrabbing = false;
       }
     };
 
@@ -141,9 +152,26 @@ export default class DrawingCanvas extends React.Component {
 
       if (this.activePointers.length == 1) {
         if (this.state.tool == "Pan" || this.canvas.isSpacePressed) {
-          if (this.canvas.isgrabbing) {
+          if (this.canvas.isGrabbing) {
             this.canvasMove(e.movementX, e.movementY);
           }
+        } else if (this.state.tool == "Draw") {
+          this.lines[this.lines.length - 1].push({
+            x:
+              (e.clientX + this.canvas.width / 2) / this.canvasProperties.zoom -
+              this.canvasProperties.offset.x / this.canvasProperties.zoom +
+              ((this.canvasProperties.zoom - 1) *
+                (this.canvas.width / this.canvasProperties.zoom)) /
+                2,
+            y:
+              (e.clientY - 64 + this.canvas.height / 2) /
+                this.canvasProperties.zoom -
+              this.canvasProperties.offset.y / this.canvasProperties.zoom +
+              ((this.canvasProperties.zoom - 1) *
+                (this.canvas.height / this.canvasProperties.zoom)) /
+                2,
+          });
+          this.drawCanvas();
         }
       }
       // If two pointers are down, check for pinch gestures
@@ -235,10 +263,10 @@ export default class DrawingCanvas extends React.Component {
     // Clear the canvas
     this.ctx.fillStyle = "#2e2b26";
     this.ctx.fillRect(
-      -this.canvas.width,
-      -this.canvas.height,
-      this.canvas.width * 4,
-      this.canvas.height * 4
+      (this.canvasProperties.zoom - 1) * this.canvas.width * 2,
+      (this.canvasProperties.zoom - 1) * this.canvas.height * 2,
+      (this.canvas.width * 2) / this.canvasProperties.zoom,
+      (this.canvas.height * 2) / this.canvasProperties.zoom
     );
 
     this.ctx.setTransform(
@@ -254,8 +282,8 @@ export default class DrawingCanvas extends React.Component {
     this.withDropShadow(() => {
       this.ctx.fillStyle = "#fff";
       this.ctx.fillRect(
-        0 + this.canvasProperties.offset.x - this.canvasProperties.width / 2,
-        0 + this.canvasProperties.offset.y - this.canvasProperties.height / 2,
+        this.canvasProperties.offset.x - this.canvasProperties.width / 2,
+        this.canvasProperties.offset.y - this.canvasProperties.height / 2,
         this.canvasProperties.width,
         this.canvasProperties.height
       );
@@ -263,11 +291,36 @@ export default class DrawingCanvas extends React.Component {
 
     this.ctx.fillStyle = "#000";
     this.ctx.fillRect(
-      0 + this.canvasProperties.offset.x,
-      0 + this.canvasProperties.offset.y,
+      this.canvasProperties.offset.x,
+      this.canvasProperties.offset.y,
       20,
       20
     );
+
+    // Draw lines
+    console.log(this.lines);
+    for (let i = 0; i < this.lines.length; i++) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(
+        this.lines[i][0].x +
+          this.canvasProperties.offset.x -
+          this.canvasProperties.width / 2,
+        this.lines[i][0].y +
+          this.canvasProperties.offset.y -
+          this.canvasProperties.height / 2
+      );
+      for (let j = 1; j < this.lines[i].length; j++) {
+        this.ctx.lineTo(
+          this.lines[i][j].x +
+            this.canvasProperties.offset.x -
+            this.canvasProperties.width / 2,
+          this.lines[i][j].y +
+            this.canvasProperties.offset.y -
+            this.canvasProperties.height / 2
+        );
+      }
+      this.ctx.stroke();
+    }
   }
 
   canvasMove(dx, dy) {
