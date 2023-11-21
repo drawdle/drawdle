@@ -244,15 +244,6 @@ export default class DrawingCanvas extends React.Component {
   }
 
   drawCanvas() {
-    // Clear the canvas
-    this.ctx.fillStyle = "#2e2b26";
-    this.ctx.fillRect(
-      (this.canvasProperties.zoom - 1) * this.canvas.width * 2,
-      (this.canvasProperties.zoom - 1) * this.canvas.height * 2,
-      (this.canvas.width * 2) / this.canvasProperties.zoom,
-      (this.canvas.height * 2) / this.canvasProperties.zoom
-    );
-
     this.ctx.setTransform(
       this.canvasProperties.zoom,
       0,
@@ -261,6 +252,13 @@ export default class DrawingCanvas extends React.Component {
       (-(this.canvasProperties.zoom - 1) * this.canvas.width) / 2,
       (-(this.canvasProperties.zoom - 1) * this.canvas.height) / 2
     );
+
+    // Clear the canvas
+    this.ctx.save();
+    this.ctx.resetTransform();
+    this.ctx.fillStyle = "#2e2b26";
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.restore();
 
     // Create paper
     this.withDropShadow(() => {
