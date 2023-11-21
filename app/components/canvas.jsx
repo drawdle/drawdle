@@ -72,7 +72,7 @@ export default class DrawingCanvas extends React.Component {
     this.canvas = document.getElementById("drawingCanvas");
     this.ctx = this.canvas.getContext("2d");
     this.canvas.width = window.innerWidth;
-    this.canvas.height = window.innerHeight - 64;
+    this.canvas.height = window.innerHeight - 64; // 64 is offset for navbar
     window.addEventListener("resize", () => {
       // Update toolbar position
       this.state.toolbarRef.current.style.top =
@@ -81,7 +81,7 @@ export default class DrawingCanvas extends React.Component {
         clamp(this.state.toolbarPos.x, 4, window.innerWidth - 257) + "px";
 
       this.canvas.width = window.innerWidth;
-      this.canvas.height = window.innerHeight - 64;
+      this.canvas.height = window.innerHeight - 64; // 64 is offset for navbar
       this.drawCanvas();
     });
     this.canvasProperties = {
@@ -125,10 +125,7 @@ export default class DrawingCanvas extends React.Component {
       } else if (this.state.tool == "Draw") {
         this.canvas.isDrawing = true;
         this.lines.push([
-          {
-            x: e.clientX,
-            y: e.clientY - 64,
-          },
+          this.translateClientToCanvas(e.clientX, e.clientY - 64), // 64 is offset for navbar height
         ]);
       }
     };
@@ -156,33 +153,9 @@ export default class DrawingCanvas extends React.Component {
             this.canvasMove(e.movementX, e.movementY);
           }
         } else if (this.state.tool == "Draw") {
-          var percentagePos = {
-            x: e.clientX / this.canvas.width,
-            y: (e.clientY - 64) / this.canvas.height,
-          };
-          var canvasBounds = {
-            x1:
-              this.canvasProperties.offset.x -
-              this.canvas.width / 2 / this.canvasProperties.zoom,
-            x2:
-              this.canvasProperties.offset.x +
-              this.canvas.width / 2 / this.canvasProperties.zoom,
-            y1:
-              this.canvasProperties.offset.y -
-              this.canvas.height / 2 / this.canvasProperties.zoom,
-            y2:
-              this.canvasProperties.offset.y +
-              this.canvas.height / 2 / this.canvasProperties.zoom,
-          };
-
-          this.lines[this.lines.length - 1].push({
-            x:
-              canvasBounds.x1 +
-              percentagePos.x * (canvasBounds.x2 - canvasBounds.x1),
-            y:
-              canvasBounds.y1 +
-              percentagePos.y * (canvasBounds.y2 - canvasBounds.y1),
-          });
+          this.lines[this.lines.length - 1].push(
+            this.translateClientToCanvas(e.clientX, e.clientY - 64) // 64 is offset for navbar height
+          );
           this.drawCanvas();
         }
       }
@@ -368,6 +341,37 @@ export default class DrawingCanvas extends React.Component {
     this.ctx.shadowBlur = originalShadowBlur;
     this.ctx.shadowOffsetX = originalShadowOffsetX;
     this.ctx.shadowOffsetY = originalShadowOffsetY;
+  }
+
+  translateClientToCanvas(x, y) {
+    var percentagePos = {
+      x: x / this.canvas.width,
+      y: y / this.canvas.height,
+    };
+    var canvasBounds = {
+      x1:
+        this.canvas.width -
+        this.canvasProperties.offset.x -
+        this.canvas.width / 2 / this.canvasProperties.zoom,
+      x2:
+        this.canvas.width -
+        this.canvasProperties.offset.x +
+        this.canvas.width / 2 / this.canvasProperties.zoom,
+      y1:
+        this.canvas.height -
+        this.canvasProperties.offset.y -
+        this.canvas.height / 2 / this.canvasProperties.zoom,
+      y2:
+        this.canvas.height -
+        this.canvasProperties.offset.y +
+        this.canvas.height / 2 / this.canvasProperties.zoom,
+    };
+    return {
+      x:
+        canvasBounds.x1 + percentagePos.x * (canvasBounds.x2 - canvasBounds.x1),
+      y:
+        canvasBounds.y1 + percentagePos.y * (canvasBounds.y2 - canvasBounds.y1),
+    };
   }
 
   render() {
