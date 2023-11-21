@@ -156,20 +156,32 @@ export default class DrawingCanvas extends React.Component {
             this.canvasMove(e.movementX, e.movementY);
           }
         } else if (this.state.tool == "Draw") {
+          var percentagePos = {
+            x: e.clientX / this.canvas.width,
+            y: (e.clientY - 64) / this.canvas.height,
+          };
+          var canvasBounds = {
+            x1:
+              this.canvasProperties.offset.x -
+              this.canvas.width / 2 / this.canvasProperties.zoom,
+            x2:
+              this.canvasProperties.offset.x +
+              this.canvas.width / 2 / this.canvasProperties.zoom,
+            y1:
+              this.canvasProperties.offset.y -
+              this.canvas.height / 2 / this.canvasProperties.zoom,
+            y2:
+              this.canvasProperties.offset.y +
+              this.canvas.height / 2 / this.canvasProperties.zoom,
+          };
+
           this.lines[this.lines.length - 1].push({
             x:
-              (e.clientX + this.canvas.width / 2) / this.canvasProperties.zoom -
-              this.canvasProperties.offset.x / this.canvasProperties.zoom +
-              ((this.canvasProperties.zoom - 1) *
-                (this.canvas.width / this.canvasProperties.zoom)) /
-                2,
+              canvasBounds.x1 +
+              percentagePos.x * (canvasBounds.x2 - canvasBounds.x1),
             y:
-              (e.clientY - 64 + this.canvas.height / 2) /
-                this.canvasProperties.zoom -
-              this.canvasProperties.offset.y / this.canvasProperties.zoom +
-              ((this.canvasProperties.zoom - 1) *
-                (this.canvas.height / this.canvasProperties.zoom)) /
-                2,
+              canvasBounds.y1 +
+              percentagePos.y * (canvasBounds.y2 - canvasBounds.y1),
           });
           this.drawCanvas();
         }
@@ -304,19 +316,19 @@ export default class DrawingCanvas extends React.Component {
       this.ctx.moveTo(
         this.lines[i][0].x +
           this.canvasProperties.offset.x -
-          this.canvasProperties.width / 2,
+          this.canvas.width / 2,
         this.lines[i][0].y +
           this.canvasProperties.offset.y -
-          this.canvasProperties.height / 2
+          this.canvas.height / 2
       );
       for (let j = 1; j < this.lines[i].length; j++) {
         this.ctx.lineTo(
           this.lines[i][j].x +
             this.canvasProperties.offset.x -
-            this.canvasProperties.width / 2,
+            this.canvas.width / 2,
           this.lines[i][j].y +
             this.canvasProperties.offset.y -
-            this.canvasProperties.height / 2
+            this.canvas.height / 2
         );
       }
       this.ctx.stroke();
