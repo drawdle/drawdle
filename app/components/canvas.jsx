@@ -35,7 +35,6 @@ export default class DrawingCanvas extends React.Component {
               y: e.clientY + this.state.toolbarRelPos.y,
             },
           });
-          console.log(this.state.toolbarRelPos, this.state.toolbarPos);
         }
 
         // Add mouseup event listener to remove the move and reset toolbar position
@@ -283,7 +282,6 @@ export default class DrawingCanvas extends React.Component {
     );
 
     // Draw lines
-    console.log(this.lines);
     for (let i = 0; i < this.lines.length; i++) {
       this.ctx.beginPath();
       this.ctx.moveTo(
