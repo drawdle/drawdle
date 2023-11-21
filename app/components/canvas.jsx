@@ -287,21 +287,13 @@ export default class DrawingCanvas extends React.Component {
     for (let i = 0; i < this.lines.length; i++) {
       this.ctx.beginPath();
       this.ctx.moveTo(
-        this.lines[i][0].x +
-          this.canvasProperties.offset.x -
-          this.canvas.width / 2,
-        this.lines[i][0].y +
-          this.canvasProperties.offset.y -
-          this.canvas.height / 2
+        this.lines[i][0].x + this.canvasProperties.offset.x,
+        this.lines[i][0].y + this.canvasProperties.offset.y
       );
       for (let j = 1; j < this.lines[i].length; j++) {
         this.ctx.lineTo(
-          this.lines[i][j].x +
-            this.canvasProperties.offset.x -
-            this.canvas.width / 2,
-          this.lines[i][j].y +
-            this.canvasProperties.offset.y -
-            this.canvas.height / 2
+          this.lines[i][j].x + this.canvasProperties.offset.x,
+          this.lines[i][j].y + this.canvasProperties.offset.y
         );
       }
       this.ctx.stroke();
@@ -352,19 +344,23 @@ export default class DrawingCanvas extends React.Component {
       x1:
         this.canvas.width -
         this.canvasProperties.offset.x -
-        this.canvas.width / 2 / this.canvasProperties.zoom,
+        this.canvas.width / 2 / this.canvasProperties.zoom -
+        this.canvas.width / 2,
       x2:
         this.canvas.width -
         this.canvasProperties.offset.x +
-        this.canvas.width / 2 / this.canvasProperties.zoom,
+        this.canvas.width / 2 / this.canvasProperties.zoom -
+        this.canvas.width / 2,
       y1:
         this.canvas.height -
         this.canvasProperties.offset.y -
-        this.canvas.height / 2 / this.canvasProperties.zoom,
+        this.canvas.height / 2 / this.canvasProperties.zoom -
+        this.canvas.height / 2,
       y2:
         this.canvas.height -
         this.canvasProperties.offset.y +
-        this.canvas.height / 2 / this.canvasProperties.zoom,
+        this.canvas.height / 2 / this.canvasProperties.zoom -
+        this.canvas.height / 2,
     };
     return {
       x:
