@@ -169,11 +169,11 @@ export default class DrawingCanvas extends React.Component {
         if (this.activePointersDist > 0) {
           if (curDiff > this.activePointersDist) {
             // zoom in
-            this.canvasSetZoom(this.canvasProperties.zoom * 1.005);
+            this.canvasSetZoom(this.canvasProperties.zoom * 1.006);
           }
           if (curDiff < this.activePointersDist) {
             // zoom out
-            this.canvasSetZoom(this.canvasProperties.zoom / 1.005);
+            this.canvasSetZoom(this.canvasProperties.zoom / 1.006);
           }
           // Pan
           this.canvasMove(
