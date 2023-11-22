@@ -152,10 +152,12 @@ export default class DrawingCanvas extends React.Component {
             this.canvasMove(e.movementX, e.movementY);
           }
         } else if (this.state.tool == "Draw") {
-          this.lines[this.lines.length - 1].push(
-            this.translateClientToCanvas(e.clientX, e.clientY - 64) // 64 is offset for navbar height
-          );
-          this.drawCanvas();
+          if (this.canvas.isDrawing) {
+            this.lines[this.lines.length - 1].push(
+              this.translateClientToCanvas(e.clientX, e.clientY - 64) // 64 is offset for navbar height
+            );
+            this.drawCanvas();
+          }
         }
       }
       // If two pointers are down, check for pinch gestures
@@ -238,8 +240,10 @@ export default class DrawingCanvas extends React.Component {
         // Shortcut for tools
         if (e.key == "m") {
           this.setState({ tool: "Pan" });
+          this.canvas.isDrawing = false;
         } else if (e.key == "b") {
           this.setState({ tool: "Draw" });
+          this.canvas.isGrabbing = false;
         }
       }
     });
