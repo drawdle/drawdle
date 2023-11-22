@@ -235,6 +235,10 @@ export default class DrawingCanvas extends React.Component {
         if (e.keyCode == 32) {
           // space is code 32
           this.canvas.isSpacePressed = true;
+          document.getElementById("drawingCanvas").style.cursor = this.canvas
+            .isGrabbing
+            ? "grabbing"
+            : "grab";
         }
 
         // Shortcut for tools
@@ -251,6 +255,7 @@ export default class DrawingCanvas extends React.Component {
       if (e.keyCode == 32) {
         //space is code 32
         this.canvas.isSpacePressed = false;
+        document.getElementById("drawingCanvas").style.cursor = "";
       }
     });
 
