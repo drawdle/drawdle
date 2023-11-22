@@ -232,7 +232,7 @@ export default class DrawingCanvas extends React.Component {
           });
         }
       } else {
-        if (e.keyCode == 32) {
+        if (e.key == " ") {
           // space is code 32
           this.canvas.isSpacePressed = true;
           this.canvas.isDrawing = false;
@@ -253,7 +253,7 @@ export default class DrawingCanvas extends React.Component {
       }
     });
     document.addEventListener("keyup", (e) => {
-      if (e.keyCode == 32) {
+      if (e.key == " ") {
         //space is code 32
         this.canvas.isSpacePressed = false;
         this.canvas.isGrabbing = false;
