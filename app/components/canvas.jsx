@@ -205,6 +205,8 @@ export default class DrawingCanvas extends React.Component {
     this.canvas.isSpacePressed = false;
     document.addEventListener("keydown", (e) => {
       if (e.ctrlKey) {
+        if (e.key == "=" && e.key == "-") return e.preventDefault();
+
         if (e.key == "=") {
           e.preventDefault();
           let i = 0;
@@ -227,10 +229,18 @@ export default class DrawingCanvas extends React.Component {
             }
           });
         }
-      }
-      if (e.keyCode == 32) {
-        // space is code 32
-        this.canvas.isSpacePressed = true;
+      } else {
+        if (e.keyCode == 32) {
+          // space is code 32
+          this.canvas.isSpacePressed = true;
+        }
+
+        // Shortcut for tools
+        if (e.key == "m") {
+          this.setState({ tool: "Pan" });
+        } else if (e.key == "b") {
+          this.setState({ tool: "Draw" });
+        }
       }
     });
     document.addEventListener("keyup", (e) => {
