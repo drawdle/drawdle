@@ -235,6 +235,7 @@ export default class DrawingCanvas extends React.Component {
         if (e.keyCode == 32) {
           // space is code 32
           this.canvas.isSpacePressed = true;
+          this.canvas.isDrawing = false;
           document.getElementById("drawingCanvas").style.cursor = this.canvas
             .isGrabbing
             ? "grabbing"
@@ -255,6 +256,7 @@ export default class DrawingCanvas extends React.Component {
       if (e.keyCode == 32) {
         //space is code 32
         this.canvas.isSpacePressed = false;
+        this.canvas.isGrabbing = false;
         document.getElementById("drawingCanvas").style.cursor = "";
       }
     });
