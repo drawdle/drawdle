@@ -281,14 +281,6 @@ export default class DrawingCanvas extends React.Component {
       );
     });
 
-    this.ctx.fillStyle = "#000";
-    this.ctx.fillRect(
-      this.canvasProperties.offset.x,
-      this.canvasProperties.offset.y,
-      20,
-      20
-    );
-
     // Draw lines
     for (let i = 0; i < this.lines.length; i++) {
       this.ctx.beginPath();
