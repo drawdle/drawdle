@@ -1,5 +1,5 @@
 import Link from "next/link";
-import "../app/globals.css";
+import "../globals.css";
 
 import { Playpen_Sans } from "next/font/google";
 import { NavBar } from "@/app/components/navbar";
