@@ -49,8 +49,18 @@ export default class DrawingCanvas extends React.Component {
             this.setState({ toolbarRelPos: null });
             this.setState({
               toolbarPos: {
-                x: clamp(this.state.toolbarPos.x, 4, window.innerWidth - 144),
-                y: clamp(this.state.toolbarPos.y, 68, window.innerHeight - 52),
+                x: clamp(
+                  this.state.toolbarPos.x,
+                  4,
+                  (typeof window != "undefined" ? window.innerWidth : 9999) -
+                    257
+                ),
+                y: clamp(
+                  this.state.toolbarPos.y,
+                  68,
+                  (typeof window != "undefined" ? window.innerHeight : 9999) -
+                    52
+                ),
               },
             });
           },
@@ -394,8 +404,16 @@ export default class DrawingCanvas extends React.Component {
           id="toolbar"
           className="flex justify-start items-center p-2 bg-beige-800 fixed text-beige-200 rounded-md gap-1 shadow-md"
           style={{
-            top: clamp(this.state.toolbarPos.y, 68, window.innerHeight - 52), // 48 + 4
-            left: clamp(this.state.toolbarPos.x, 4, window.innerWidth - 257), // 253 + 4
+            left: clamp(
+              this.state.toolbarPos.x,
+              4,
+              (typeof window != "undefined" ? window.innerWidth : 9999) - 257
+            ), // 253 + 4
+            top: clamp(
+              this.state.toolbarPos.y,
+              68,
+              (typeof window != "undefined" ? window.innerHeight : 9999) - 52
+            ), // 48 + 4
           }}
           ref={this.state.toolbarRef}
         >
