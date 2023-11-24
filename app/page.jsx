@@ -15,7 +15,7 @@ export default function Home() {
           <p className="text-5xl text-beige-900">Draw-dle</p>
           <p className="text-beige-700">Learn to draw by completing doodles</p>
           <button
-            className="mt-8 rounded-full bg-beige-800 px-8 py-3 text-2xl text-beige-300"
+            className="mt-8 rounded-full bg-beige-800 hover:bg-beige-700 transition-colors px-8 py-3 text-2xl text-beige-300"
             onClick={() => {
               document.body.style.overflow = "hidden";
               document.getElementById("transition").style.transitionDuration =
