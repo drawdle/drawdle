@@ -84,10 +84,12 @@ export default class DrawingCanvas extends React.Component {
     this.canvas.height = window.innerHeight - 64; // 64 is offset for navbar
     window.addEventListener("resize", () => {
       // Update toolbar position
-      this.state.toolbarRef.current.style.top =
-        clamp(this.state.toolbarPos.y, 68, window.innerHeight - 52) + "px";
-      this.state.toolbarRef.current.style.left =
-        clamp(this.state.toolbarPos.x, 4, window.innerWidth - 257) + "px";
+      if (this.state.toolbarRef.current) {
+        this.state.toolbarRef.current.style.top =
+          clamp(this.state.toolbarPos.y, 68, window.innerHeight - 52) + "px";
+        this.state.toolbarRef.current.style.left =
+          clamp(this.state.toolbarPos.x, 4, window.innerWidth - 257) + "px";
+      }
 
       this.canvas.width = window.innerWidth;
       this.canvas.height = window.innerHeight - 64; // 64 is offset for navbar
