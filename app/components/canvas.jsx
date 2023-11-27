@@ -294,15 +294,13 @@ export default class DrawingCanvas extends React.Component {
     this.ctx.restore();
 
     // Create paper
-    this.withDropShadow(() => {
-      this.ctx.fillStyle = "#fff";
-      this.ctx.fillRect(
-        this.canvasProperties.offset.x - this.canvasProperties.width / 2,
-        this.canvasProperties.offset.y - this.canvasProperties.height / 2,
-        this.canvasProperties.width,
-        this.canvasProperties.height
-      );
-    });
+    this.ctx.fillStyle = "#fff";
+    this.ctx.fillRect(
+      this.canvasProperties.offset.x - this.canvasProperties.width / 2,
+      this.canvasProperties.offset.y - this.canvasProperties.height / 2,
+      this.canvasProperties.width,
+      this.canvasProperties.height
+    );
 
     // Draw lines
     for (let i = 0; i < this.lines.length; i++) {
