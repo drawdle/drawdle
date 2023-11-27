@@ -317,6 +317,33 @@ export default class DrawingCanvas extends React.Component {
       }
       this.ctx.stroke();
     }
+
+    // Remove lines that are outside of the paper
+    this.ctx.fillStyle = "#2e2b26";
+    this.ctx.fillRect(
+      this.canvasProperties.offset.x - this.canvasProperties.width / 2 - 42000,
+      -42000,
+      42000,
+      84000
+    );
+    this.ctx.fillRect(
+      this.canvasProperties.offset.x + this.canvasProperties.width / 2,
+      -42000,
+      42000,
+      84000
+    );
+    this.ctx.fillRect(
+      -42000,
+      this.canvasProperties.offset.y - this.canvasProperties.height / 2 - 42000,
+      84000,
+      42000
+    );
+    this.ctx.fillRect(
+      -42000,
+      this.canvasProperties.offset.y + this.canvasProperties.height / 2,
+      84000,
+      42000
+    );
   }
 
   canvasMove(dx, dy) {
