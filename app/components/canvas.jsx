@@ -143,6 +143,16 @@ export default class DrawingCanvas extends React.Component {
           color: this.state.tool == "Erase" ? "#fff" : "#000",
           size: this.state.tool == "Erase" ? 10 : 1,
         });
+      } else if (this.state.tool == "Line") {
+        this.canvas.isDrawing = true;
+        this.lines.push({
+          points: [
+            this.translateClientToCanvas(e.clientX, e.clientY - 64), // 64 is offset for navbar height
+            this.translateClientToCanvas(e.clientX, e.clientY - 64), // same point write, 2nd point will be changed as mouse moves
+          ],
+          color: "#000",
+          size: 1,
+        });
       }
     };
     const handlePointerUp = (e) => {
@@ -173,6 +183,13 @@ export default class DrawingCanvas extends React.Component {
             this.lines[this.lines.length - 1].points.push(
               this.translateClientToCanvas(e.clientX, e.clientY - 64) // 64 is offset for navbar height
             );
+            this.drawCanvas();
+          }
+        } else if (this.state.tool == "Line") {
+          if (this.canvas.isDrawing) {
+            // change 2nd point to current mouse position
+            this.lines[this.lines.length - 1].points[1] =
+              this.translateClientToCanvas(e.clientX, e.clientY - 64); // 64 is offset for navbar height
             this.drawCanvas();
           }
         }
