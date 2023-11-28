@@ -133,12 +133,14 @@ export default class DrawingCanvas extends React.Component {
       this.activePointers.push(e);
       if (this.state.tool == "Pan" || this.canvas.isSpacePressed) {
         this.canvas.isGrabbing = true;
-      } else if (this.state.tool == "Draw") {
+      } else if (this.state.tool == "Draw" || this.state.tool == "Erase") {
         this.canvas.isDrawing = true;
         this.lines.push({
           points: [
             this.translateClientToCanvas(e.clientX, e.clientY - 64), // 64 is offset for navbar height
           ],
+          color: this.state.tool == "Erase" ? "#fff" : "#000",
+          size: this.state.tool == "Erase" ? 10 : 1,
         });
       }
     };
@@ -165,7 +167,7 @@ export default class DrawingCanvas extends React.Component {
           if (this.canvas.isGrabbing) {
             this.canvasMove(e.movementX, e.movementY);
           }
-        } else if (this.state.tool == "Draw") {
+        } else if (this.state.tool == "Draw" || this.state.tool == "Erase") {
           if (this.canvas.isDrawing) {
             this.lines[this.lines.length - 1].points.push(
               this.translateClientToCanvas(e.clientX, e.clientY - 64) // 64 is offset for navbar height
@@ -305,7 +307,10 @@ export default class DrawingCanvas extends React.Component {
     );
 
     // Draw lines
+    this.ctx.lineCap = "round";
     for (let i = 0; i < this.lines.length; i++) {
+      this.ctx.lineWidth = this.lines[i].size;
+      this.ctx.strokeStyle = this.lines[i].color;
       this.ctx.beginPath();
       this.ctx.moveTo(
         this.lines[i].points[0].x + this.canvasProperties.offset.x,
