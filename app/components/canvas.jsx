@@ -135,9 +135,11 @@ export default class DrawingCanvas extends React.Component {
         this.canvas.isGrabbing = true;
       } else if (this.state.tool == "Draw") {
         this.canvas.isDrawing = true;
-        this.lines.push([
-          this.translateClientToCanvas(e.clientX, e.clientY - 64), // 64 is offset for navbar height
-        ]);
+        this.lines.push({
+          points: [
+            this.translateClientToCanvas(e.clientX, e.clientY - 64), // 64 is offset for navbar height
+          ],
+        });
       }
     };
     const handlePointerUp = (e) => {
@@ -165,7 +167,7 @@ export default class DrawingCanvas extends React.Component {
           }
         } else if (this.state.tool == "Draw") {
           if (this.canvas.isDrawing) {
-            this.lines[this.lines.length - 1].push(
+            this.lines[this.lines.length - 1].points.push(
               this.translateClientToCanvas(e.clientX, e.clientY - 64) // 64 is offset for navbar height
             );
             this.drawCanvas();
@@ -306,13 +308,13 @@ export default class DrawingCanvas extends React.Component {
     for (let i = 0; i < this.lines.length; i++) {
       this.ctx.beginPath();
       this.ctx.moveTo(
-        this.lines[i][0].x + this.canvasProperties.offset.x,
-        this.lines[i][0].y + this.canvasProperties.offset.y
+        this.lines[i].points[0].x + this.canvasProperties.offset.x,
+        this.lines[i].points[0].y + this.canvasProperties.offset.y
       );
-      for (let j = 1; j < this.lines[i].length; j++) {
+      for (let j = 1; j < this.lines[i].points.length; j++) {
         this.ctx.lineTo(
-          this.lines[i][j].x + this.canvasProperties.offset.x,
-          this.lines[i][j].y + this.canvasProperties.offset.y
+          this.lines[i].points[j].x + this.canvasProperties.offset.x,
+          this.lines[i].points[j].y + this.canvasProperties.offset.y
         );
       }
       this.ctx.stroke();
