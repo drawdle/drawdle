@@ -71,6 +71,8 @@ export default class DrawingCanvas extends React.Component {
       toolbarRelPos: null,
       toolbarPos: { x: 8, y: 74 },
       toolbarRef: createRef(),
+
+      brushSize: 1,
     };
   }
 
@@ -141,7 +143,7 @@ export default class DrawingCanvas extends React.Component {
             this.translateClientToCanvas(e.clientX, e.clientY - 64), // 64 is offset for navbar height
           ],
           color: this.state.tool == "Erase" ? "#fff" : "#000",
-          size: this.state.tool == "Erase" ? 10 : 1,
+          size: this.state.tool == "Erase" ? 10 : this.state.brushSize,
         });
       } else if (this.state.tool == "Line") {
         this.canvas.isDrawing = true;
@@ -469,6 +471,14 @@ export default class DrawingCanvas extends React.Component {
           }}
           ref={this.state.toolbarRef}
         >
+          <Tooltip
+            id="toolbar-tooltip"
+            place="bottom"
+            delayShow={500}
+            style={{
+              background: "#898272",
+            }}
+          />
           <div
             className={
               (this.state.toolbarGrabbing ? "cursor-grabbing" : "cursor-grab") +
@@ -568,14 +578,14 @@ export default class DrawingCanvas extends React.Component {
               <i className={e.icon}></i>
             </button>
           ))}
-          <Tooltip
-            id="toolbar-tooltip"
-            place="bottom"
-            delayShow={500}
-            style={{
-              background: "#898272",
+          <div className="border-l border-beige-700 h-8 w-0"></div>
+          <input
+            className="bg-beige-700 h-4 rounded-sm w-12 outline-none px-2 py-4 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            onChange={(e) => {
+              this.setState({ brushSize: e.target.value || 1 });
             }}
-          />
+            type="number"
+          ></input>
         </div>
       </>
     );
