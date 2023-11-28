@@ -2,6 +2,7 @@
 import React, { createRef } from "react";
 import "../disableSwipeGesture.css";
 import { clamp, mean } from "../utils/math";
+import { Tooltip } from "react-tooltip";
 
 export default class DrawingCanvas extends React.Component {
   constructor(props) {
@@ -503,6 +504,8 @@ export default class DrawingCanvas extends React.Component {
               onClick={() => {
                 this.setState({ tool: e.text });
               }}
+              data-tooltip-id="toolbar-tooltip"
+              data-tooltip-content={e.tooltip || e.text || ""}
             >
               <i className={e.icon}></i>
             </button>
@@ -542,10 +545,20 @@ export default class DrawingCanvas extends React.Component {
               key={i}
               className={"w-8 h-8 hover:bg-[#fff4] rounded"}
               onClick={e.onClick}
+              data-tooltip-id="toolbar-tooltip"
+              data-tooltip-content={e.tooltip || e.text || ""}
             >
               <i className={e.icon}></i>
             </button>
           ))}
+          <Tooltip
+            id="toolbar-tooltip"
+            place="bottom"
+            delayShow={500}
+            style={{
+              background: "#898272",
+            }}
+          />
         </div>
       </>
     );
