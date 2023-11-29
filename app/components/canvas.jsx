@@ -580,11 +580,14 @@ export default class DrawingCanvas extends React.Component {
           ))}
           <div className="border-l border-beige-700 h-8 w-0"></div>
           <input
-            className="bg-beige-700 h-4 rounded-sm w-12 outline-none px-2 py-4 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            className="bg-beige-700 h-4 rounded-sm w-16 outline-none px-2 py-4 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             onChange={(e) => {
-              this.setState({ brushSize: e.target.value || 1 });
+              this.setState({ brushSize: clamp(e.target.value, 1, 100) || 1 });
             }}
             type="number"
+            min="1"
+            max="100"
+            value={clamp(this.state.brushSize, 1, 100) || 1}
           ></input>
         </div>
       </>
