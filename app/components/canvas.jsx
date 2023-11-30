@@ -333,6 +333,7 @@ export default class DrawingCanvas extends React.Component {
 
     // Draw lines
     this.ctx.lineCap = "round";
+    this.ctx.lineJoin = "round";
     for (let i = 0; i < this.lines.length; i++) {
       this.ctx.lineWidth = this.lines[i].size;
       this.ctx.strokeStyle = this.lines[i].color;
