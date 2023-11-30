@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "next": "14.0.2",
+    "rc-slider": "^10.5.0",
     "react": "^18",
     "react-dom": "^18",
     "react-tooltip": "^5.24.0"

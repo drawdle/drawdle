@@ -1,8 +1,12 @@
 "use client";
 import React, { createRef } from "react";
-import "../disableSwipeGesture.css";
 import { clamp, mean } from "../utils/math";
+import "../disableSwipeGesture.css";
+
 import { Tooltip } from "react-tooltip";
+
+import Slider from "rc-slider";
+import "rc-slider/assets/index.css";
 
 export default class DrawingCanvas extends React.Component {
   constructor(props) {
@@ -73,6 +77,7 @@ export default class DrawingCanvas extends React.Component {
       toolbarRef: createRef(),
 
       brushSize: 1,
+      brushMenuVisible: false,
     };
   }
 
@@ -579,18 +584,102 @@ export default class DrawingCanvas extends React.Component {
             </button>
           ))}
           <div className="border-l border-beige-700 h-8 w-0"></div>
-          <input
-            className="bg-beige-700 h-4 rounded-sm w-16 outline-none px-2 py-4 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-            onChange={(e) => {
-              this.setState({ brushSize: clamp(e.target.value, 1, 100) || 1 });
-            }}
-            type="number"
-            min="1"
-            max="100"
-            value={clamp(this.state.brushSize, 1, 100) || 1}
-          ></input>
+          <div className="relative">
+            <button
+              className={
+                "w-12 h-8 hover:bg-[#fff4] rounded flex flex-row items-center justify-center pb-0.5"
+              }
+              onClick={() => {
+                this.setState({
+                  brushMenuVisible: !this.state.brushMenuVisible,
+                });
+              }}
+            >
+              <div className="w-8 h-8 gap-px flex flex-col items-center justify-center">
+                <div className="w-4 h-4 flex justify-center items-center">
+                  <div
+                    className="rounded-full bg-beige-200"
+                    style={{
+                      width: `${
+                        (clamp(this.state.brushSize, 1, 100) * 16) / 100
+                      }px`,
+                      height: `${
+                        (clamp(this.state.brushSize, 1, 100) * 16) / 100
+                      }px`,
+                    }}
+                  ></div>
+                </div>
+                <p className="text-[8px] h-2 w-8 align-middle">
+                  {this.state.brushSize}
+                </p>
+              </div>
+              <i className="bi-caret-down-fill w-4 h-2 [&::before]:text-xs [&::before]:-translate-y-2"></i>
+            </button>
+            <BrushMenu
+              visible={this.state.brushMenuVisible}
+              onBrushSizeChangeInput={(e) => {
+                this.setState({
+                  brushSize: clamp(e.target.value, 1, 100) || 1,
+                });
+              }}
+              onBrushSizeChangeSlider={(e) => {
+                this.setState({
+                  brushSize: clamp(e, 1, 100) || 1,
+                });
+              }}
+              brushSize={clamp(this.state.brushSize, 1, 100) || 1}
+            />
+          </div>
         </div>
       </>
     );
   }
+}
+
+function BrushMenu(props) {
+  return (
+    <>
+      {props.visible && (
+        <div className="h-48 w-64 bg-beige-800 absolute left-0 top-0 translate-y-11 rounded-md flex flex-col p-3">
+          <div className="flex flex-row gap-2 justify-center items-center">
+            <input
+              className="bg-beige-700 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] h-4 rounded-sm w-16 outline-none px-2 py-4 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              onChange={props.onBrushSizeChangeInput}
+              type="number"
+              min="1"
+              max="100"
+              value={props.brushSize}
+            ></input>
+            <Slider
+              min={1}
+              max={100}
+              defaultValue={props.brushSize}
+              className="mx-2"
+              handleRender={(node) => {
+                return (
+                  <div
+                    className="w-[14px] h-[14px] bg-beige-700 rounded-full transition"
+                    style={{
+                      ...node.props.style,
+                      top: "0px",
+                      position: "absolute",
+                    }}
+                  ></div>
+                );
+              }}
+              styles={{
+                track: {
+                  backgroundColor: "#b7ad98",
+                },
+                rail: {
+                  backgroundColor: "#2e2b26",
+                },
+              }}
+              onChange={props.onBrushSizeChangeSlider}
+            />
+          </div>
+        </div>
+      )}
+    </>
+  );
 }
