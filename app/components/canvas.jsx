@@ -644,7 +644,7 @@ function BrushMenu(props) {
         <div className="h-48 w-64 bg-beige-800 absolute left-0 top-0 translate-y-11 rounded-md flex flex-col p-3">
           <div className="flex flex-row gap-2 justify-center items-center">
             <input
-              className="bg-beige-700 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] h-4 rounded-sm w-16 outline-none px-2 py-4 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="bg-beige-700 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] h-4 rounded-md w-10 outline-none px-1 py-3 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               onChange={props.onBrushSizeChangeInput}
               type="number"
               min="1"
