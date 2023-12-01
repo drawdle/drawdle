@@ -97,6 +97,7 @@ export function ColorPicker() {
               style={{
                 top: selector2dPos.y,
                 left: selector2dPos.x,
+                borderColor: selector2dPos.y > 118 ? "white" : "black",
               }}
             ></div>
           </div>
