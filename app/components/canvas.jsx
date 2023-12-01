@@ -549,6 +549,7 @@ export default class DrawingCanvas extends React.Component {
               }
               onClick={() => {
                 this.setState({ tool: e.text });
+                this.setState({ brushMenuVisible: false });
               }}
               data-tooltip-id="toolbar-tooltip"
               data-tooltip-content={e.tooltip || e.text || ""}
