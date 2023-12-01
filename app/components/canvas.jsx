@@ -601,6 +601,8 @@ export default class DrawingCanvas extends React.Component {
           <div className="border-l border-beige-700 h-8 w-0"></div>
           <div className="relative">
             <button
+              data-tooltip-id="toolbar-tooltip"
+              data-tooltip-content="Brush settings"
               className={
                 "w-12 h-8 hover:bg-[#fff4] rounded flex flex-row items-center justify-center pb-0.5"
               }
