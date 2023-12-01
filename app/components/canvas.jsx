@@ -165,6 +165,7 @@ export default class DrawingCanvas extends React.Component {
           size: 1,
         });
       }
+      this.drawCanvas();
     };
     const handlePointerUp = (e) => {
       const index = this.activePointers.findIndex(
@@ -174,6 +175,7 @@ export default class DrawingCanvas extends React.Component {
       if (this.state.tool == "Pan" || this.canvas.isSpacePressed) {
         this.canvas.isGrabbing = false;
       }
+      this.drawCanvas();
     };
 
     // https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events/Pinch_zoom_gestures
@@ -346,11 +348,18 @@ export default class DrawingCanvas extends React.Component {
         this.lines[i].points[0].x + this.canvasProperties.offset.x,
         this.lines[i].points[0].y + this.canvasProperties.offset.y
       );
-      for (let j = 1; j < this.lines[i].points.length; j++) {
+      if (this.lines[i].points.length == 1) {
         this.ctx.lineTo(
-          this.lines[i].points[j].x + this.canvasProperties.offset.x,
-          this.lines[i].points[j].y + this.canvasProperties.offset.y
+          this.lines[i].points[0].x + this.canvasProperties.offset.x,
+          this.lines[i].points[0].y + this.canvasProperties.offset.y
         );
+      } else {
+        for (let j = 1; j < this.lines[i].points.length; j++) {
+          this.ctx.lineTo(
+            this.lines[i].points[j].x + this.canvasProperties.offset.x,
+            this.lines[i].points[j].y + this.canvasProperties.offset.y
+          );
+        }
       }
       this.ctx.stroke();
     }
