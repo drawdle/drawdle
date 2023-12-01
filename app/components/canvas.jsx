@@ -58,7 +58,7 @@ export default class DrawingCanvas extends React.Component {
                   this.state.toolbarPos.x,
                   4,
                   (typeof window != "undefined" ? window.innerWidth : 9999) -
-                    257
+                    314
                 ),
                 y: clamp(
                   this.state.toolbarPos.y,
@@ -97,7 +97,7 @@ export default class DrawingCanvas extends React.Component {
         this.state.toolbarRef.current.style.top =
           clamp(this.state.toolbarPos.y, 68, window.innerHeight - 52) + "px";
         this.state.toolbarRef.current.style.left =
-          clamp(this.state.toolbarPos.x, 4, window.innerWidth - 257) + "px";
+          clamp(this.state.toolbarPos.x, 4, window.innerWidth - 314) + "px";
       }
 
       this.canvas.width = window.innerWidth;
@@ -480,7 +480,7 @@ export default class DrawingCanvas extends React.Component {
             left: clamp(
               this.state.toolbarPos.x,
               4,
-              (typeof window != "undefined" ? window.innerWidth : 9999) - 257
+              (typeof window != "undefined" ? window.innerWidth : 9999) - 314
             ), // 253 + 4
             top: clamp(
               this.state.toolbarPos.y,
