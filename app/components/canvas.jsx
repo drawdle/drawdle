@@ -162,7 +162,7 @@ export default class DrawingCanvas extends React.Component {
             this.translateClientToCanvas(e.clientX, e.clientY - 64), // same point write, 2nd point will be changed as mouse moves
           ],
           color: "#000",
-          size: 1,
+          size: this.state.brushSize,
         });
       }
       this.drawCanvas();
