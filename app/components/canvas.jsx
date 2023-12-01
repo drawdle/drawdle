@@ -77,6 +77,7 @@ export default class DrawingCanvas extends React.Component {
       toolbarRef: createRef(),
 
       brushSize: 1,
+      eraserSize: 5,
       brushMenuVisible: false,
     };
   }
@@ -148,7 +149,10 @@ export default class DrawingCanvas extends React.Component {
             this.translateClientToCanvas(e.clientX, e.clientY - 64), // 64 is offset for navbar height
           ],
           color: this.state.tool == "Erase" ? "#fff" : "#000",
-          size: this.state.tool == "Erase" ? 10 : this.state.brushSize,
+          size:
+            this.state.tool == "Erase"
+              ? this.state.eraserSize
+              : this.state.brushSize,
         });
       } else if (this.state.tool == "Line") {
         this.canvas.isDrawing = true;
@@ -602,16 +606,34 @@ export default class DrawingCanvas extends React.Component {
                     className="rounded-full bg-beige-200"
                     style={{
                       width: `${
-                        (clamp(this.state.brushSize, 1, 100) * 16) / 100
+                        (clamp(
+                          this.state.tool == "Erase"
+                            ? this.state.eraserSize
+                            : this.state.brushSize,
+                          1,
+                          100
+                        ) *
+                          16) /
+                        100
                       }px`,
                       height: `${
-                        (clamp(this.state.brushSize, 1, 100) * 16) / 100
+                        (clamp(
+                          this.state.tool == "Erase"
+                            ? this.state.eraserSize
+                            : this.state.brushSize,
+                          1,
+                          100
+                        ) *
+                          16) /
+                        100
                       }px`,
                     }}
                   ></div>
                 </div>
                 <p className="text-[8px] h-2 w-8 align-middle">
-                  {this.state.brushSize}
+                  {this.state.tool == "Erase"
+                    ? this.state.eraserSize
+                    : this.state.brushSize}
                 </p>
               </div>
               <i className="bi-caret-down-fill w-4 h-2 [&::before]:text-xs [&::before]:-translate-y-2"></i>
@@ -619,16 +641,32 @@ export default class DrawingCanvas extends React.Component {
             <BrushMenu
               visible={this.state.brushMenuVisible}
               onBrushSizeChangeInput={(e) => {
-                this.setState({
-                  brushSize: clamp(e.target.value, 1, 100) || 1,
-                });
+                this.state.tool == "Erase"
+                  ? this.setState({
+                      brushSize: clamp(e.target.value, 1, 100) || 1,
+                    })
+                  : this.setState({
+                      eraserSize: clamp(e.target.value, 1, 100) || 1,
+                    });
               }}
               onBrushSizeChangeSlider={(e) => {
-                this.setState({
-                  brushSize: clamp(e, 1, 100) || 1,
-                });
+                this.state.tool == "Erase"
+                  ? this.setState({
+                      eraserSize: clamp(e, 1, 100) || 1,
+                    })
+                  : this.setState({
+                      brushSize: clamp(e, 1, 100) || 1,
+                    });
               }}
-              brushSize={clamp(this.state.brushSize, 1, 100) || 1}
+              brushSize={
+                clamp(
+                  this.state.tool == "Erase"
+                    ? this.state.eraserSize
+                    : this.state.brushSize,
+                  1,
+                  100
+                ) || 1
+              }
             />
           </div>
         </div>
