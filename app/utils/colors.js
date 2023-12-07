@@ -87,3 +87,44 @@ export function rgb2hsl(r, g, b) {
     c && (v == r ? (g - b) / c : v == g ? 2 + (b - r) / c : 4 + (r - g) / c);
   return [60 * (h < 0 ? h + 6 : h), f ? c / f : 0, (v + v - c) / 2];
 }
+
+/**
+ * Calculates the luminosity estimation based on the given hue value.
+ *
+ * @param {number} hue - The hue value.
+ * @return {number} The calculated luminosity estimation.
+ */
+function hueToRelativeLuminosityEstimation(hue) {
+  const p = 0.7495,
+    e1 = 1.4,
+    m1 = 90,
+    d1 = -0.8166,
+    s1 = 2000,
+    e2 = 2.1,
+    m2 = 250,
+    d2 = 0.8166,
+    s2 = 1200;
+
+  function bellCurve(x, d, p, e, s, m) {
+    return (
+      (1 / (d * Math.sqrt(2 * p))) *
+      Math.pow(e, (-1 / s) * Math.pow((x - m) / d, 2))
+    );
+  }
+
+  return (
+    bellCurve(hue, d1, p, e1, s1, m1) +
+    bellCurve(hue, d2, p, e2, s2, m2) +
+    bellCurve(hue, d1, p, e1, s1, m1 + 360)
+  );
+}
+export function checkHlLuminosityCurve(cursorPosition, width, height, hue) {
+  function calculateCurve(x, curveFactor) {
+    return ((curveFactor + 1) * Math.pow(x, 2)) / 4 + 0.5;
+  }
+  const x = cursorPosition.x / width,
+    y = (height - cursorPosition.y) / height;
+  const curvePoint = calculateCurve(x, hueToRelativeLuminosityEstimation(hue));
+  console.log(curvePoint);
+  return y < curvePoint;
+}
