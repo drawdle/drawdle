@@ -9,7 +9,7 @@ import {
 } from "../utils/colors";
 
 export class ColorPicker extends Component {
-  constructor() {
+  constructor(props) {
     super();
     this.state = {
       hue: 0,
@@ -29,6 +29,7 @@ export class ColorPicker extends Component {
         b: 0,
       },
       hex: "000000",
+      oldHex: props.color ? props.color.replace("#", "") : "000000",
     };
   }
 
@@ -193,22 +194,22 @@ export class ColorPicker extends Component {
   render() {
     return (
       <div className="flex flex-row justify-center items-center bg-beige-900 bg-opacity-50 w-[100vw] h-[100vh] fixed top-0 left-0 z-[9999]">
-        <div className="w-[calc(128rem/4)] h-96 bg-beige-800 flex flex-col justify-center items-center rounded-lg">
+        <div className="w-[calc(144rem/4)] h-96 bg-beige-800 text-beige-200 flex flex-col justify-center items-center rounded-lg">
           <div className="w-128 h-64 flex flex-row gap-4">
             {/* Saturation and luminosity 2D slider */}
             <div
-              className="w-64 h-64 select-none"
+              className="w-64 h-64 select-none rounded-md"
               style={{
                 background: `hsl(${this.state.hue}, 100%, 50%)`,
               }}
               draggable={false}
             >
               <div
-                className="bg-gradient-to-r from-white to-transparent w-full h-full"
+                className="bg-gradient-to-r from-white to-transparent w-full h-full rounded-md"
                 draggable={false}
               >
                 <div
-                  className="slider2d bg-gradient-to-t from-black to-transparent w-full h-full relative"
+                  className="slider2d bg-gradient-to-t from-black to-transparent w-full h-full relative rounded-md"
                   draggable={false}
                 >
                   <div
@@ -233,11 +234,11 @@ export class ColorPicker extends Component {
 
             {/* Hue slider */}
             <div
-              className="slider1d h-64 w-8 vertical-rainbow select-none relative"
+              className="slider1d h-64 w-8 vertical-rainbow select-none relative rounded-md"
               draggable={false}
             >
               <div
-                className="w-11 h-1 border-[6px] border-y-transparent border-x-white -translate-x-1.5 -translate-y-1/2 absolute pointer-events-none"
+                className="w-11 h-1 border-[6px] border-y-transparent border-x-beige-200 -translate-x-1.5 -translate-y-1/2 absolute pointer-events-none"
                 style={{
                   top: this.state.selector1dPos,
                 }}
@@ -245,7 +246,7 @@ export class ColorPicker extends Component {
               ></div>
             </div>
 
-            <div className="flex flex-col gap-4 text-beige-200">
+            <div className="flex flex-col gap-4">
               {/* HSV input */}
               <div className="flex flex-col gap-2">
                 <div className="flex flex-row gap-2">
@@ -429,6 +430,22 @@ export class ColorPicker extends Component {
                   }}
                 />
               </div>
+            </div>
+
+            {/* Color preview */}
+            <div className="flex flex-col gap-1 text-xs items-center -mt-2">
+              <p>New</p>
+              <div className="w-16 h-20 flex flex-col rounded-md overflow-hidden">
+                <div
+                  className="w-full h-1/2"
+                  style={{ backgroundColor: "#" + this.state.hex }}
+                ></div>
+                <div
+                  className="w-full h-1/2"
+                  style={{ backgroundColor: "#" + this.state.oldHex }}
+                ></div>
+              </div>
+              <p>Current</p>
             </div>
           </div>
         </div>
