@@ -63,6 +63,17 @@ function hueToRelativeLuminosityEstimation(hue) {
     bellCurve(hue, d1, p, e1, s1, m1 + 360)
   );
 }
+/**
+ * Checks the luminosity curve for a given cursor position on the screen.
+ *
+ * @param {Object} cursorPosition - The position of the cursor on the color picker.
+ * @param {number} cursorPosition.x - The x-coordinate of the cursor.
+ * @param {number} cursorPosition.y - The y-coordinate of the cursor.
+ * @param {number} width - The width of the screen.
+ * @param {number} height - The height of the screen.
+ * @param {number} hue - The hue value.
+ * @returns {boolean} Whether the y-coordinate is below the calculated curve point.
+ */
 export function checkHlLuminosityCurve(cursorPosition, width, height, hue) {
   function calculateCurve(x, curveFactor) {
     return ((curveFactor + 1) * Math.pow(x, 2)) / 4 + 0.5;
