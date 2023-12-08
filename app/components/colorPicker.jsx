@@ -1,11 +1,6 @@
 import { Component, useState } from "react";
 import { clamp } from "../utils/math";
-import {
-  checkHlLuminosityCurve,
-  hsl2rgb,
-  hsv2hsl,
-  hsv2rgb,
-} from "../utils/colors";
+import { checkHlLuminosityCurve, hsv2rgb, rgb2hsv } from "../utils/colors";
 
 export class ColorPicker extends Component {
   constructor() {
@@ -21,6 +16,7 @@ export class ColorPicker extends Component {
         x: 0,
         y: 0,
       },
+      selectorSize: 256,
       hsl: {
         h: 0,
         s: 1,
@@ -44,14 +40,12 @@ export class ColorPicker extends Component {
   updateColor(color, type) {
     switch (type) {
       case "hsv":
-        var hsv = color;
-        var temp_hsl = hsv2hsl(hsv.h, hsv.s, hsv.v);
-        var hsl = {
-          h: temp_hsl[0],
-          s: temp_hsl[1],
-          l: temp_hsl[2],
+        var hsv = {
+          h: color.h,
+          s: color.s,
+          v: color.v,
         };
-        var temp_rgb = hsv2rgb(hsl.h, hsl.s, hsl.l);
+        var temp_rgb = hsv2rgb(color.h, color.s, color.v);
         var rgb = {
           r: temp_rgb[0],
           g: temp_rgb[1],
@@ -60,50 +54,34 @@ export class ColorPicker extends Component {
         break;
 
       case "rgb":
-        var rgb = color;
-        var temp_hsl = rgb2hsl(rgb.r, rgb.g, rgb.b);
-        var hsl = {
-          h: temp_hsl[0],
-          s: temp_hsl[1],
-          l: temp_hsl[2],
-        };
-        var temp_hsv = rgb2hsv(rgb.r, rgb.g, rgb.b);
-        var hsv = {
-          h: temp_hsv[0],
-          s: temp_hsv[1],
-          v: temp_hsv[2],
-        };
-        break;
-
-      case "hsl":
-        var hsl = color;
-        var temp_hsv = hsl2hsv(hsl.h, hsl.s, hsl.l);
-        var hsv = {
-          h: temp_hsv[0],
-          s: temp_hsv[1],
-          v: temp_hsv[2],
-        };
-        var temp_rgb = hsl2rgb(hsl.h, hsl.s, hsl.l);
         var rgb = {
-          r: temp_rgb[0],
-          g: temp_rgb[1],
-          b: temp_rgb[2],
+          r: color.r,
+          g: color.g,
+          b: color.b,
+        };
+        var temp_hsv = rgb2hsv(color.r, color.g, color.b);
+        var hsv = {
+          h: temp_hsv[0],
+          s: temp_hsv[1],
+          v: temp_hsv[2],
         };
         break;
     }
-
     this.setState({
-      hsl: {
-        h: hsl[0],
-        s: hsl[1],
-        l: hsl[2],
-      },
+      rgb: rgb,
     });
     this.setState({
-      rgb: {
-        r: rgb[0],
-        g: rgb[1],
-        b: rgb[2],
+      hue: hsv.h,
+      saturation: hsv.s,
+      value: hsv.v,
+    });
+
+    const newSlider2dPosX = (hsv.s / 100) * this.state.selectorSize;
+    const newSlider2dPosY = ((100 - hsv.v) / 100) * this.state.selectorSize;
+    this.setState({
+      selector2dPos: {
+        x: newSlider2dPosX,
+        y: newSlider2dPosY,
       },
     });
   }
@@ -111,8 +89,13 @@ export class ColorPicker extends Component {
   onSaturationValueChange(e) {
     const slider2d = document.querySelector(".slider2d");
     const boundingRect = slider2d.getBoundingClientRect();
-    const posPercent = clamp(
+    const posPercentX = clamp(
       (e.clientX - boundingRect.left) / boundingRect.width,
+      0,
+      1
+    );
+    const posPercentY = clamp(
+      (e.clientY - boundingRect.top) / boundingRect.height,
       0,
       1
     );
@@ -122,9 +105,13 @@ export class ColorPicker extends Component {
         y: clamp(e.clientY - boundingRect.top, 0, boundingRect.height),
       },
     });
-    const newSaturation = clamp(posPercent * 100, 0, 100);
-    const newValue = clamp(100 - posPercent * 100, 0, 100);
+    const newSaturation = clamp(posPercentX * 100, 0, 100);
+    const newValue = clamp(100 - posPercentY * 100, 0, 100);
     this.setState({ saturation: newSaturation, value: newValue });
+    this.updateColor(
+      { h: this.state.hue, s: newSaturation, v: newValue },
+      "hsv"
+    );
   }
 
   onHueChange(e) {
@@ -144,6 +131,10 @@ export class ColorPicker extends Component {
     });
     const newHue = 360 - clamp(posPercent * 360, 0, 359.99);
     this.setState({ hue: newHue });
+    this.updateColor(
+      { h: newHue, s: this.state.saturation, v: this.state.value },
+      "hsv"
+    );
   }
 
   componentDidMount() {
@@ -166,7 +157,7 @@ export class ColorPicker extends Component {
         this.onSaturationValueChange(e);
       }
     });
-    document.addEventListener("mouseup", (e) => {
+    document.addEventListener("mouseup", () => {
       if (this.state.mouseDown1d) {
         this.setState({ mouseDown1d: false });
       } else if (this.state.mouseDown2d) {
@@ -177,53 +168,201 @@ export class ColorPicker extends Component {
 
   render() {
     return (
-      <div className="w-[calc(128rem/4)] h-96 bg-beige-800 flex flex-col justify-center items-center">
-        <div className="w-128 h-64 flex flex-row gap-4">
-          <div
-            className="w-64 h-64 select-none"
-            style={{
-              background: `hsl(${this.state.hue}, 100%, 50%)`,
-            }}
-            draggable={false}
-          >
+      <div className="flex flex-row justify-center items-center bg-beige-900 bg-opacity-50 w-[100vw] h-[100vh] fixed top-0 left-0 z-[9999]">
+        <div className="w-[calc(128rem/4)] h-96 bg-beige-800 flex flex-col justify-center items-center rounded-lg">
+          <div className="w-128 h-64 flex flex-row gap-4">
+            {/* Saturation and luminosity 2D slider */}
             <div
-              className="bg-gradient-to-r from-white to-transparent w-full h-full"
+              className="w-64 h-64 select-none"
+              style={{
+                background: `hsl(${this.state.hue}, 100%, 50%)`,
+              }}
               draggable={false}
             >
               <div
-                className="slider2d bg-gradient-to-t from-black to-transparent w-full h-full relative"
+                className="bg-gradient-to-r from-white to-transparent w-full h-full"
                 draggable={false}
               >
                 <div
-                  className="absolute -translate-x-1/2 -translate-y-1/2 w-3 h-3 border border-black rounded-full pointer-events-none"
+                  className="slider2d bg-gradient-to-t from-black to-transparent w-full h-full relative"
                   draggable={false}
-                  style={{
-                    top: this.state.selector2dPos.y,
-                    left: this.state.selector2dPos.x,
-                    borderColor: checkHlLuminosityCurve(
-                      this.state.selector2dPos,
-                      256,
-                      256,
-                      this.state.hue
-                    )
-                      ? "white"
-                      : "black",
-                  }}
-                ></div>
+                >
+                  <div
+                    className="absolute -translate-x-1/2 -translate-y-1/2 w-3 h-3 border border-black rounded-full pointer-events-none"
+                    draggable={false}
+                    style={{
+                      top: this.state.selector2dPos.y,
+                      left: this.state.selector2dPos.x,
+                      borderColor: checkHlLuminosityCurve(
+                        this.state.selector2dPos,
+                        this.state.selectorSize,
+                        this.state.selectorSize,
+                        this.state.hue
+                      )
+                        ? "white"
+                        : "black",
+                    }}
+                  ></div>
+                </div>
               </div>
             </div>
-          </div>
-          <div
-            className="slider1d h-64 w-8 vertical-rainbow select-none relative"
-            draggable={false}
-          >
+
+            {/* Hue slider */}
             <div
-              className="w-11 h-1 border-[6px] border-y-transparent border-x-white -translate-x-1.5 -translate-y-1/2 absolute pointer-events-none"
-              style={{
-                top: this.state.selector1dPos,
-              }}
+              className="slider1d h-64 w-8 vertical-rainbow select-none relative"
               draggable={false}
-            ></div>
+            >
+              <div
+                className="w-11 h-1 border-[6px] border-y-transparent border-x-white -translate-x-1.5 -translate-y-1/2 absolute pointer-events-none"
+                style={{
+                  top: this.state.selector1dPos,
+                }}
+                draggable={false}
+              ></div>
+            </div>
+
+            <div className="flex flex-col gap-4 text-beige-200">
+              {/* HSV input */}
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-row gap-2">
+                  <p>H:</p>
+                  <input
+                    type="number"
+                    className="bg-beige-700 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] h-4 rounded-md w-10 outline-none px-1 py-3 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    min={0}
+                    max={360}
+                    value={Math.round(this.state.hue).toString()}
+                    onChange={(e) => {
+                      const newHue = clamp(e.target.value, 0, 360);
+                      this.setState({ hue: newHue });
+                      this.updateColor(
+                        {
+                          h: newHue,
+                          s: this.state.saturation,
+                          v: this.state.value,
+                        },
+                        "hsv"
+                      );
+                    }}
+                  />
+                  <p>º</p>
+                </div>
+                <div className="flex flex-row gap-2">
+                  <p>S:</p>
+                  <input
+                    type="number"
+                    className="bg-beige-700 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] h-4 rounded-md w-10 outline-none px-1 py-3 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    min={0}
+                    max={100}
+                    value={Math.round(this.state.saturation).toString()}
+                    onChange={(e) => {
+                      const newSaturation = clamp(e.target.value, 0, 100);
+                      this.setState({
+                        saturation: newSaturation,
+                      });
+                      this.updateColor(
+                        {
+                          h: this.state.hue,
+                          s: newSaturation,
+                          v: this.state.value,
+                        },
+                        "hsv"
+                      );
+                    }}
+                  />
+                  <p>%</p>
+                </div>
+                <div className="flex flex-row gap-2">
+                  <p>V:</p>
+                  <input
+                    type="number"
+                    className="bg-beige-700 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] h-4 rounded-md w-10 outline-none px-1 py-3 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    min={0}
+                    max={100}
+                    value={Math.round(this.state.value).toString()}
+                    onChange={(e) => {
+                      const newValue = clamp(e.target.value, 0, 100);
+                      this.setState({
+                        value: newValue,
+                      });
+                      this.updateColor(
+                        {
+                          h: this.state.hue,
+                          s: this.state.saturation,
+                          v: newValue,
+                        },
+                        "hsv"
+                      );
+                    }}
+                  />
+                  <p>%</p>
+                </div>
+              </div>
+
+              {/* RGB input */}
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-row gap-2">
+                  <p>R:</p>
+                  <input
+                    type="number"
+                    className="bg-beige-700 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] h-4 rounded-md w-10 outline-none px-1 py-3 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    min={0}
+                    max={255}
+                    value={Math.round(this.state.rgb.r).toString()}
+                    onChange={(e) => {
+                      const newRgb = {
+                        ...this.state.rgb,
+                        r: clamp(e.target.value, 0, 255),
+                      };
+                      this.setState({
+                        rgb: newRgb,
+                      });
+                      this.updateColor(newRgb, "rgb");
+                    }}
+                  />
+                </div>
+                <div className="flex flex-row gap-2">
+                  <p>G:</p>
+                  <input
+                    type="number"
+                    className="bg-beige-700 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] h-4 rounded-md w-10 outline-none px-1 py-3 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    min={0}
+                    max={255}
+                    value={Math.round(this.state.rgb.g).toString()}
+                    onChange={(e) => {
+                      const newRgb = {
+                        ...this.state.rgb,
+                        g: clamp(e.target.value, 0, 255),
+                      };
+                      this.setState({
+                        rgb: newRgb,
+                      });
+                      this.updateColor(newRgb, "rgb");
+                    }}
+                  />
+                </div>
+                <div className="flex flex-row gap-2">
+                  <p>B:</p>
+                  <input
+                    type="number"
+                    className="bg-beige-700 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] h-4 rounded-md w-10 outline-none px-1 py-3 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    min={0}
+                    max={255}
+                    value={Math.round(this.state.rgb.b).toString()}
+                    onChange={(e) => {
+                      const newRgb = {
+                        ...this.state.rgb,
+                        b: clamp(e.target.value, 0, 255),
+                      };
+                      this.setState({
+                        rgb: newRgb,
+                      });
+                      this.updateColor(newRgb, "rgb");
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
