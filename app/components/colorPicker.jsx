@@ -103,6 +103,11 @@ export class ColorPicker extends Component {
         y: newSlider2dPosY,
       },
     });
+
+    const newSlider1dPos = ((360 - hsv.h) / 360) * this.state.selectorSize;
+    this.setState({
+      selector1dPos: newSlider1dPos,
+    });
   }
 
   onSaturationValueChange(e) {
