@@ -17,13 +17,8 @@ export class ColorPicker extends Component {
         y: 0,
       },
       selectorSize: 256,
-      hsl: {
-        h: 0,
-        s: 1,
-        l: 0.5,
-      },
       rgb: {
-        r: 255,
+        r: 0,
         g: 0,
         b: 0,
       },
