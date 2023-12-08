@@ -7,6 +7,7 @@ import { Tooltip } from "react-tooltip";
 
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
+import { ColorPicker } from "./colorPicker";
 
 export default class DrawingCanvas extends React.Component {
   constructor(props) {
@@ -465,6 +466,7 @@ export default class DrawingCanvas extends React.Component {
   render() {
     return (
       <>
+        <ColorPicker />
         <canvas
           id="drawingCanvas"
           className="fixed top-16 left-0"
