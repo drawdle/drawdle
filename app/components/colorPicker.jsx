@@ -1,6 +1,12 @@
 import { Component, useState } from "react";
 import { clamp } from "../utils/math";
-import { checkHlLuminosityCurve, hsv2rgb, rgb2hsv } from "../utils/colors";
+import {
+  checkHlLuminosityCurve,
+  hex2rgb,
+  hsv2rgb,
+  rgb2hex,
+  rgb2hsv,
+} from "../utils/colors";
 
 export class ColorPicker extends Component {
   constructor() {
@@ -22,6 +28,7 @@ export class ColorPicker extends Component {
         g: 0,
         b: 0,
       },
+      hex: "000000",
     };
   }
 
@@ -46,6 +53,7 @@ export class ColorPicker extends Component {
           g: temp_rgb[1],
           b: temp_rgb[2],
         };
+        var hex = rgb2hex(rgb.r, rgb.g, rgb.b);
         break;
 
       case "rgb":
@@ -60,7 +68,22 @@ export class ColorPicker extends Component {
           s: temp_hsv[1],
           v: temp_hsv[2],
         };
+        var hex = rgb2hex(rgb.r, rgb.g, rgb.b);
         break;
+
+      case "hex":
+        var temp_rgb = hex2rgb(color);
+        var rgb = {
+          r: temp_rgb[0],
+          g: temp_rgb[1],
+          b: temp_rgb[2],
+        };
+        var temp_hsv = rgb2hsv(rgb.r, rgb.g, rgb.b);
+        var hsv = {
+          h: temp_hsv[0],
+          s: temp_hsv[1],
+          v: temp_hsv[2],
+        };
     }
     this.setState({
       rgb: rgb,
@@ -70,6 +93,7 @@ export class ColorPicker extends Component {
       saturation: hsv.s,
       value: hsv.v,
     });
+    this.setState({ hex: hex });
 
     const newSlider2dPosX = (hsv.s / 100) * this.state.selectorSize;
     const newSlider2dPosY = ((100 - hsv.v) / 100) * this.state.selectorSize;
@@ -356,6 +380,49 @@ export class ColorPicker extends Component {
                     }}
                   />
                 </div>
+              </div>
+
+              {/* HEX input */}
+              <div className="flex flex-row gap-1">
+                <p>#</p>
+                <input
+                  type="text"
+                  maxLength={6}
+                  className="bg-beige-700 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] h-4 rounded-md w-24 outline-none px-1 py-3 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  value={this.state.hex}
+                  onChange={(e) => {
+                    const newHex = e.target.value;
+                    this.setState({
+                      hex: newHex,
+                    });
+                    this.updateColor(newHex, "hex");
+                  }}
+                  onKeyDown={(e) => {
+                    const allowedChars = [
+                      "0",
+                      "1",
+                      "2",
+                      "3",
+                      "4",
+                      "5",
+                      "6",
+                      "7",
+                      "8",
+                      "9",
+                      "a",
+                      "b",
+                      "c",
+                      "d",
+                      "e",
+                      "f",
+                      "backspace",
+                      "enter",
+                      "delete",
+                    ];
+                    if (!allowedChars.includes(e.key.toLowerCase()))
+                      e.preventDefault();
+                  }}
+                />
               </div>
             </div>
           </div>

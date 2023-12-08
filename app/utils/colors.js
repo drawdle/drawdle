@@ -34,6 +34,41 @@ export function rgb2hsv(r, g, b) {
 }
 
 /**
+ * Converts a hexadecimal color code to RGB format.
+ *
+ * @param {string} hex - The hexadecimal color code to convert.
+ * @return {[number, number, number]}
+ */
+export function hex2rgb(hex) {
+  hex = hex.padEnd(6, "0").slice(0, 6);
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return [
+    parseInt(result[1], 16),
+    parseInt(result[2], 16),
+    parseInt(result[3], 16),
+  ];
+}
+
+/**
+ * Converts an RGB color value to a hexadecimal color code.
+ *
+ * @param {number} r - The red component of the RGB color value (0-255).
+ * @param {number} g - The green component of the RGB color value (0-255).
+ * @param {number} b - The blue component of the RGB color value (0-255).
+ * @return {string} The hexadecimal color code.
+ */
+export function rgb2hex(r, g, b) {
+  return (
+    (1 << 24) +
+    (Math.round(r) << 16) +
+    (Math.round(g) << 8) +
+    Math.round(b)
+  )
+    .toString(16)
+    .slice(1);
+}
+
+/**
  * Calculates the luminosity estimation based on the given hue value.
  *
  * @param {number} hue - The hue value.
