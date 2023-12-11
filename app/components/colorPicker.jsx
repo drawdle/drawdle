@@ -10,7 +10,7 @@ import {
 
 export class ColorPicker extends Component {
   constructor(props) {
-    super();
+    super(props);
     this.state = {
       hue: 0,
       saturation: 0,
@@ -20,7 +20,7 @@ export class ColorPicker extends Component {
       selector1dPos: 0,
       selector2dPos: {
         x: 0,
-        y: 0,
+        y: 256,
       },
       selectorSize: 256,
       rgb: {
@@ -194,22 +194,22 @@ export class ColorPicker extends Component {
   render() {
     return (
       <div className="flex flex-row justify-center items-center bg-beige-900 bg-opacity-50 w-[100vw] h-[100vh] fixed top-0 left-0 z-[9999]">
-        <div className="w-[calc(144rem/4)] h-96 bg-beige-800 text-beige-200 flex flex-col justify-center items-center rounded-lg">
-          <div className="w-128 h-64 flex flex-row gap-4">
+        <div className="w-[calc(144rem/4)] h-96 bg-beige-800 text-beige-200 flex flex-col justify-center items-center rounded-lg gap-8">
+          <div className="w-128 h-64 flex flex-row gap-4 mt-4">
             {/* Saturation and luminosity 2D slider */}
             <div
-              className="w-64 h-64 select-none rounded-md"
+              className="w-64 h-64 select-none rounded"
               style={{
                 background: `hsl(${this.state.hue}, 100%, 50%)`,
               }}
               draggable={false}
             >
               <div
-                className="bg-gradient-to-r from-white to-transparent w-full h-full rounded-md"
+                className="bg-gradient-to-r from-white to-transparent w-full h-full rounded"
                 draggable={false}
               >
                 <div
-                  className="slider2d bg-gradient-to-t from-black to-transparent w-full h-full relative rounded-md"
+                  className="slider2d bg-gradient-to-t from-black to-transparent w-full h-full relative rounded"
                   draggable={false}
                 >
                   <div
@@ -234,7 +234,7 @@ export class ColorPicker extends Component {
 
             {/* Hue slider */}
             <div
-              className="slider1d h-64 w-8 vertical-rainbow select-none relative rounded-md"
+              className="slider1d h-64 w-8 vertical-rainbow select-none relative rounded"
               draggable={false}
             >
               <div
@@ -253,7 +253,7 @@ export class ColorPicker extends Component {
                   <p>H:</p>
                   <input
                     type="number"
-                    className="bg-beige-700 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] h-4 rounded-md w-10 outline-none px-1 py-3 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="bg-beige-700 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] h-4 rounded w-10 outline-none px-1 py-3 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     min={0}
                     max={360}
                     value={Math.round(this.state.hue).toString()}
@@ -447,6 +447,28 @@ export class ColorPicker extends Component {
               </div>
               <p>Current</p>
             </div>
+          </div>
+
+          {/* Modal buttons */}
+          <div className="flex flex-row gap-2 w-full justify-end px-8">
+            <button
+              className="transition-colors bg-transparent hover:bg-[#fff2] border border-transparent w-24 px-4 py-1 rounded-full"
+              onClick={() => {
+                if (this.props.onClose) this.props.onClose();
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              className="transition-colors bg-transparent hover:bg-beige-400 hover:text-beige-900 border border-beige-400 w-24 px-4 py-1 rounded-full"
+              onClick={() => {
+                if (this.props.updateColor)
+                  this.props.updateColor(this.state.hex);
+                if (this.props.onClose) this.props.onClose();
+              }}
+            >
+              Save
+            </button>
           </div>
         </div>
       </div>

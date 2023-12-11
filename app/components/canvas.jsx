@@ -80,6 +80,9 @@ export default class DrawingCanvas extends React.Component {
       brushSize: 1,
       eraserSize: 5,
       brushMenuVisible: false,
+
+      brushColor: "000000",
+      colorPickerVisible: false,
     };
   }
 
@@ -149,7 +152,8 @@ export default class DrawingCanvas extends React.Component {
           points: [
             this.translateClientToCanvas(e.clientX, e.clientY - 64), // 64 is offset for navbar height
           ],
-          color: this.state.tool == "Erase" ? "#fff" : "#000",
+          color:
+            this.state.tool == "Erase" ? "#fff" : "#" + this.state.brushColor,
           size:
             this.state.tool == "Erase"
               ? this.state.eraserSize
@@ -162,7 +166,7 @@ export default class DrawingCanvas extends React.Component {
             this.translateClientToCanvas(e.clientX, e.clientY - 64), // 64 is offset for navbar height
             this.translateClientToCanvas(e.clientX, e.clientY - 64), // same point write, 2nd point will be changed as mouse moves
           ],
-          color: "#000",
+          color: "#" + this.state.brushColor,
           size: this.state.brushSize,
         });
       }
@@ -466,7 +470,17 @@ export default class DrawingCanvas extends React.Component {
   render() {
     return (
       <>
-        <ColorPicker />
+        {this.state.colorPickerVisible && (
+          <ColorPicker
+            color={this.state.brushColor}
+            onClose={() => {
+              this.setState({ colorPickerVisible: false });
+            }}
+            updateColor={(color) => {
+              this.setState({ brushColor: color });
+            }}
+          />
+        )}
         <canvas
           id="drawingCanvas"
           className="fixed top-16 left-0"
@@ -477,7 +491,7 @@ export default class DrawingCanvas extends React.Component {
         ></canvas>
         <div
           id="toolbar"
-          className="flex justify-start items-center p-2 bg-beige-800 fixed text-beige-200 rounded-md gap-1 shadow-md"
+          className="flex justify-start items-center p-2 bg-beige-800 fixed text-beige-200 rounded-md gap-2 shadow-md"
           style={{
             left: clamp(
               this.state.toolbarPos.x,
@@ -683,6 +697,17 @@ export default class DrawingCanvas extends React.Component {
               }
             />
           </div>
+          <button
+            className="w-6 h-6 rounded-full"
+            style={{
+              backgroundColor: "#" + this.state.brushColor,
+            }}
+            onClick={() => {
+              this.setState({
+                colorPickerVisible: true,
+              });
+            }}
+          ></button>
         </div>
       </>
     );
