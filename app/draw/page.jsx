@@ -18,8 +18,8 @@ export default class Draw extends React.Component {
   render() {
     return (
       <>
-        <NavBar />
         <main className="bg-beige-200 h-[100vh]">
+          <NavBar />
           <div id="canvasContainer">
             <DrawingCanvas />
           </div>
