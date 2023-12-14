@@ -28,7 +28,7 @@ export class ColorPicker extends Component {
         g: 0,
         b: 0,
       },
-      hex: "000000",
+      hex: props.color ? props.color.replace("#", "") : "000000",
       oldHex: props.color ? props.color.replace("#", "") : "000000",
     };
   }
@@ -189,6 +189,8 @@ export class ColorPicker extends Component {
         this.setState({ mouseDown2d: false });
       }
     });
+
+    this.updateColor(this.state.hex, "hex");
   }
 
   render() {
