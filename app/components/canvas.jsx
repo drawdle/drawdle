@@ -144,33 +144,35 @@ export default class DrawingCanvas extends React.Component {
     );
     const handlePointerDown = (e) => {
       this.activePointers.push(e);
-      if (this.state.tool == "Pan" || this.canvas.isSpacePressed) {
-        this.canvas.isGrabbing = true;
-      } else if (this.state.tool == "Draw" || this.state.tool == "Erase") {
-        this.canvas.isDrawing = true;
-        this.lines.push({
-          points: [
-            this.translateClientToCanvas(e.clientX, e.clientY - 64), // 64 is offset for navbar height
-          ],
-          color:
-            this.state.tool == "Erase" ? "#fff" : "#" + this.state.brushColor,
-          size:
-            this.state.tool == "Erase"
-              ? this.state.eraserSize
-              : this.state.brushSize,
-        });
-      } else if (this.state.tool == "Line") {
-        this.canvas.isDrawing = true;
-        this.lines.push({
-          points: [
-            this.translateClientToCanvas(e.clientX, e.clientY - 64), // 64 is offset for navbar height
-            this.translateClientToCanvas(e.clientX, e.clientY - 64), // same point write, 2nd point will be changed as mouse moves
-          ],
-          color: "#" + this.state.brushColor,
-          size: this.state.brushSize,
-        });
+      if (this.activePointers.length == 1) {
+        if (this.state.tool == "Pan" || this.canvas.isSpacePressed) {
+          this.canvas.isGrabbing = true;
+        } else if (this.state.tool == "Draw" || this.state.tool == "Erase") {
+          this.canvas.isDrawing = true;
+          this.lines.push({
+            points: [
+              this.translateClientToCanvas(e.clientX, e.clientY - 64), // 64 is offset for navbar height
+            ],
+            color:
+              this.state.tool == "Erase" ? "#fff" : "#" + this.state.brushColor,
+            size:
+              this.state.tool == "Erase"
+                ? this.state.eraserSize
+                : this.state.brushSize,
+          });
+        } else if (this.state.tool == "Line") {
+          this.canvas.isDrawing = true;
+          this.lines.push({
+            points: [
+              this.translateClientToCanvas(e.clientX, e.clientY - 64), // 64 is offset for navbar height
+              this.translateClientToCanvas(e.clientX, e.clientY - 64), // same point write, 2nd point will be changed as mouse moves
+            ],
+            color: "#" + this.state.brushColor,
+            size: this.state.brushSize,
+          });
+        }
+        this.drawCanvas();
       }
-      this.drawCanvas();
     };
     const handlePointerUp = (e) => {
       const index = this.activePointers.findIndex(
