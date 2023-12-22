@@ -195,7 +195,7 @@ export class ColorPicker extends Component {
 
   render() {
     return (
-      <div className="flex flex-row justify-center items-center bg-beige-900 bg-opacity-50 w-[100vw] h-[100vh] fixed top-0 left-0 z-[9999]">
+      <div className="flex flex-row justify-center items-center bg-beige-900 bg-opacity-50 w-[100vw] h-[100vh] fixed top-0 left-0 z-[9999] select-none">
         <div className="w-[calc(144rem/4)] h-96 bg-beige-800 text-beige-200 flex flex-col justify-center items-center rounded-lg gap-8">
           <div className="w-128 h-64 flex flex-row gap-4 mt-4">
             {/* Saturation and luminosity 2D slider */}
