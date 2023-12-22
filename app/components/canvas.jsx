@@ -578,7 +578,7 @@ export default class DrawingCanvas extends React.Component {
                 this.setState({ brushMenuVisible: false });
               }}
               data-tooltip-id="toolbar-tooltip"
-              data-tooltip-content={e.tooltip || e.text || ""}
+              data-tooltip-content={e.text || ""}
             >
               <i className={e.icon}></i>
             </button>
@@ -586,7 +586,7 @@ export default class DrawingCanvas extends React.Component {
           <div className="border-l border-beige-700 h-8 w-0"></div>
           {[
             {
-              text: "Zoom",
+              text: "Zoom in",
               icon: "bi-zoom-in",
               onClick: () => {
                 let i = 0;
@@ -619,7 +619,7 @@ export default class DrawingCanvas extends React.Component {
               className={"w-8 h-8 hover:bg-[#fff4] rounded"}
               onClick={e.onClick}
               data-tooltip-id="toolbar-tooltip"
-              data-tooltip-content={e.tooltip || e.text || ""}
+              data-tooltip-content={e.text || ""}
             >
               <i className={e.icon}></i>
             </button>
@@ -730,6 +730,8 @@ export default class DrawingCanvas extends React.Component {
                     colorPickerVisible: true,
                   });
                 }}
+                data-tooltip-id="toolbar-tooltip"
+                data-tooltip-content="Color picker"
               ></button>
             </>
           )}
