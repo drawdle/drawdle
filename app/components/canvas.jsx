@@ -81,6 +81,8 @@ export default class DrawingCanvas extends React.Component {
       eraserSize: 5,
       brushMenuVisible: false,
 
+      brushOpacity: 100,
+
       brushColor: "000000",
       colorPickerVisible: false,
     };
@@ -349,7 +351,9 @@ export default class DrawingCanvas extends React.Component {
     this.ctx.lineJoin = "round";
     for (let i = 0; i < this.lines.length; i++) {
       this.ctx.lineWidth = this.lines[i].size;
-      this.ctx.strokeStyle = this.lines[i].color;
+      this.ctx.strokeStyle =
+        this.lines[i].color +
+        Math.round(this.state.brushOpacity * 2.55).toString(16);
       this.ctx.beginPath();
       this.ctx.moveTo(
         this.lines[i].points[0].x + this.canvasProperties.offset.x,
@@ -697,6 +701,17 @@ export default class DrawingCanvas extends React.Component {
                   100
                 ) || 1
               }
+              onBrushOpacityChangeInput={(e) => {
+                this.setState({
+                  brushOpacity: clamp(e.target.value, 0, 100) || 100,
+                });
+              }}
+              onBrushOpacityChangeSlider={(e) => {
+                this.setState({
+                  brushOpacity: clamp(e, 0, 100) || 100,
+                });
+              }}
+              brushOpacity={clamp(this.state.brushOpacity, 0, 100) || 100}
             />
           </div>
           <button
@@ -720,7 +735,8 @@ function BrushMenu(props) {
   return (
     <>
       {props.visible && (
-        <div className="h-48 w-64 bg-beige-800 absolute left-0 top-0 translate-y-11 rounded-md flex flex-col p-3">
+        <div className="h-48 w-64 bg-beige-800 absolute left-0 top-0 translate-y-11 rounded-md flex flex-col p-3 gap-2">
+          <p className="text-sm text-beige-600 -mb-1">Size</p>
           <div className="flex flex-row gap-2 justify-center items-center">
             <input
               className="bg-beige-700 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] h-4 rounded-md w-10 outline-none px-1 py-3 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -756,6 +772,46 @@ function BrushMenu(props) {
                 },
               }}
               onChange={props.onBrushSizeChangeSlider}
+            />
+          </div>
+
+          <p className="text-sm text-beige-600 -mb-1">Opacity</p>
+          <div className="flex flex-row gap-2 justify-center items-center">
+            <input
+              className="bg-beige-700 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] h-4 rounded-md w-10 outline-none px-1 py-3 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              onChange={props.onBrushOpacityChangeInput}
+              type="number"
+              min="1"
+              max="100"
+              value={props.brushOpacity}
+            ></input>
+            <p className="-ml-1">%</p>
+            <Slider
+              min={1}
+              max={100}
+              defaultValue={props.brushOpacity}
+              className="mx-2"
+              handleRender={(node) => {
+                return (
+                  <div
+                    className="w-[14px] h-[14px] bg-beige-700 rounded-full transition"
+                    style={{
+                      ...node.props.style,
+                      top: "0px",
+                      position: "absolute",
+                    }}
+                  ></div>
+                );
+              }}
+              styles={{
+                track: {
+                  backgroundColor: "#b7ad98",
+                },
+                rail: {
+                  backgroundColor: "#2e2b26",
+                },
+              }}
+              onChange={props.onBrushOpacityChangeSlider}
             />
           </div>
         </div>
