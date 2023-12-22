@@ -620,111 +620,115 @@ export default class DrawingCanvas extends React.Component {
               <i className={e.icon}></i>
             </button>
           ))}
-          <div className="border-l border-beige-700 h-8 w-0"></div>
-          <div className="relative">
-            <button
-              data-tooltip-id="toolbar-tooltip"
-              data-tooltip-content="Brush settings"
-              className={
-                "w-12 h-8 hover:bg-[#fff4] rounded flex flex-row items-center justify-center pb-0.5"
-              }
-              onClick={() => {
-                this.setState({
-                  brushMenuVisible: !this.state.brushMenuVisible,
-                });
-              }}
-            >
-              <div className="w-8 h-8 gap-px flex flex-col items-center justify-center">
-                <div className="w-4 h-4 flex justify-center items-center">
-                  <div
-                    className="rounded-full bg-beige-200"
-                    style={{
-                      width: `${
-                        (clamp(
-                          this.state.tool == "Erase"
-                            ? this.state.eraserSize
-                            : this.state.brushSize,
-                          1,
-                          100
-                        ) *
-                          16) /
-                        100
-                      }px`,
-                      height: `${
-                        (clamp(
-                          this.state.tool == "Erase"
-                            ? this.state.eraserSize
-                            : this.state.brushSize,
-                          1,
-                          100
-                        ) *
-                          16) /
-                        100
-                      }px`,
-                    }}
-                  ></div>
-                </div>
-                <p className="text-[8px] h-2 w-8 align-middle">
-                  {this.state.tool == "Erase"
-                    ? this.state.eraserSize
-                    : this.state.brushSize}
-                </p>
+          {["Draw", "Erase", "Line"].includes(this.state.tool) && (
+            <>
+              <div className="border-l border-beige-700 h-8 w-0"></div>
+              <div className="relative">
+                <button
+                  data-tooltip-id="toolbar-tooltip"
+                  data-tooltip-content="Brush settings"
+                  className={
+                    "w-12 h-8 hover:bg-[#fff4] rounded flex flex-row items-center justify-center pb-0.5"
+                  }
+                  onClick={() => {
+                    this.setState({
+                      brushMenuVisible: !this.state.brushMenuVisible,
+                    });
+                  }}
+                >
+                  <div className="w-8 h-8 gap-px flex flex-col items-center justify-center">
+                    <div className="w-4 h-4 flex justify-center items-center">
+                      <div
+                        className="rounded-full bg-beige-200"
+                        style={{
+                          width: `${
+                            (clamp(
+                              this.state.tool == "Erase"
+                                ? this.state.eraserSize
+                                : this.state.brushSize,
+                              1,
+                              100
+                            ) *
+                              16) /
+                            100
+                          }px`,
+                          height: `${
+                            (clamp(
+                              this.state.tool == "Erase"
+                                ? this.state.eraserSize
+                                : this.state.brushSize,
+                              1,
+                              100
+                            ) *
+                              16) /
+                            100
+                          }px`,
+                        }}
+                      ></div>
+                    </div>
+                    <p className="text-[8px] h-2 w-8 align-middle">
+                      {this.state.tool == "Erase"
+                        ? this.state.eraserSize
+                        : this.state.brushSize}
+                    </p>
+                  </div>
+                  <i className="bi-caret-down-fill w-4 h-2 [&::before]:text-xs [&::before]:-translate-y-2"></i>
+                </button>
+                <BrushMenu
+                  visible={this.state.brushMenuVisible}
+                  onBrushSizeChangeInput={(e) => {
+                    this.state.tool == "Erase"
+                      ? this.setState({
+                          brushSize: clamp(e.target.value, 1, 100) || 1,
+                        })
+                      : this.setState({
+                          eraserSize: clamp(e.target.value, 1, 100) || 1,
+                        });
+                  }}
+                  onBrushSizeChangeSlider={(e) => {
+                    this.state.tool == "Erase"
+                      ? this.setState({
+                          eraserSize: clamp(e, 1, 100) || 1,
+                        })
+                      : this.setState({
+                          brushSize: clamp(e, 1, 100) || 1,
+                        });
+                  }}
+                  brushSize={
+                    clamp(
+                      this.state.tool == "Erase"
+                        ? this.state.eraserSize
+                        : this.state.brushSize,
+                      1,
+                      100
+                    ) || 1
+                  }
+                  onBrushOpacityChangeInput={(e) => {
+                    this.setState({
+                      brushOpacity: clamp(e.target.value, 0, 100) || 100,
+                    });
+                  }}
+                  onBrushOpacityChangeSlider={(e) => {
+                    this.setState({
+                      brushOpacity: clamp(e, 0, 100) || 100,
+                    });
+                  }}
+                  brushOpacity={clamp(this.state.brushOpacity, 0, 100) || 100}
+                />
               </div>
-              <i className="bi-caret-down-fill w-4 h-2 [&::before]:text-xs [&::before]:-translate-y-2"></i>
-            </button>
-            <BrushMenu
-              visible={this.state.brushMenuVisible}
-              onBrushSizeChangeInput={(e) => {
-                this.state.tool == "Erase"
-                  ? this.setState({
-                      brushSize: clamp(e.target.value, 1, 100) || 1,
-                    })
-                  : this.setState({
-                      eraserSize: clamp(e.target.value, 1, 100) || 1,
-                    });
-              }}
-              onBrushSizeChangeSlider={(e) => {
-                this.state.tool == "Erase"
-                  ? this.setState({
-                      eraserSize: clamp(e, 1, 100) || 1,
-                    })
-                  : this.setState({
-                      brushSize: clamp(e, 1, 100) || 1,
-                    });
-              }}
-              brushSize={
-                clamp(
-                  this.state.tool == "Erase"
-                    ? this.state.eraserSize
-                    : this.state.brushSize,
-                  1,
-                  100
-                ) || 1
-              }
-              onBrushOpacityChangeInput={(e) => {
-                this.setState({
-                  brushOpacity: clamp(e.target.value, 0, 100) || 100,
-                });
-              }}
-              onBrushOpacityChangeSlider={(e) => {
-                this.setState({
-                  brushOpacity: clamp(e, 0, 100) || 100,
-                });
-              }}
-              brushOpacity={clamp(this.state.brushOpacity, 0, 100) || 100}
-            />
-          </div>
-          <button
-            className="w-6 h-6 rounded-full"
-            style={{
-              backgroundColor: "#" + this.state.brushColor,
-            }}
-            onClick={() => {
-              this.setState({
-                colorPickerVisible: true,
-              });
-            }}
-          ></button>
+              <button
+                className="w-6 h-6 rounded-full"
+                style={{
+                  backgroundColor: "#" + this.state.brushColor,
+                }}
+                onClick={() => {
+                  this.setState({
+                    colorPickerVisible: true,
+                  });
+                }}
+              ></button>
+            </>
+          )}
         </div>
       </>
     );
