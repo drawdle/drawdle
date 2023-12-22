@@ -156,11 +156,14 @@ export default class DrawingCanvas extends React.Component {
               this.translateClientToCanvas(e.clientX, e.clientY - 64), // 64 is offset for navbar height
             ],
             color:
-              this.state.tool == "Erase" ? "#fff" : "#" + this.state.brushColor,
+              this.state.tool == "Erase"
+                ? "#ffffff"
+                : "#" + this.state.brushColor,
             size:
               this.state.tool == "Erase"
                 ? this.state.eraserSize
                 : this.state.brushSize,
+            opacity: this.state.brushOpacity,
           });
         } else if (this.state.tool == "Line") {
           this.canvas.isDrawing = true;
@@ -171,6 +174,7 @@ export default class DrawingCanvas extends React.Component {
             ],
             color: "#" + this.state.brushColor,
             size: this.state.brushSize,
+            opacity: this.state.brushOpacity,
           });
         }
         this.drawCanvas();
@@ -353,7 +357,7 @@ export default class DrawingCanvas extends React.Component {
       this.ctx.lineWidth = this.lines[i].size;
       this.ctx.strokeStyle =
         this.lines[i].color +
-        Math.round(this.state.brushOpacity * 2.55).toString(16);
+        Math.round(this.lines[i].opacity * 2.55).toString(16);
       this.ctx.beginPath();
       this.ctx.moveTo(
         this.lines[i].points[0].x + this.canvasProperties.offset.x,
