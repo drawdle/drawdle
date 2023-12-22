@@ -252,7 +252,7 @@ export class ColorPicker extends Component {
               {/* HSV input */}
               <div className="flex flex-col gap-2">
                 <div className="flex flex-row gap-2">
-                  <p>H:</p>
+                  <p className="w-3">H:</p>
                   <input
                     type="number"
                     className="bg-beige-700 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] h-4 rounded w-10 outline-none px-1 py-3 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -272,10 +272,10 @@ export class ColorPicker extends Component {
                       );
                     }}
                   />
-                  <p>º</p>
+                  <p className="-ml-1 w-2">º</p>
                 </div>
                 <div className="flex flex-row gap-2">
-                  <p>S:</p>
+                  <p className="w-3">S:</p>
                   <input
                     type="number"
                     className="bg-beige-700 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] h-4 rounded-md w-10 outline-none px-1 py-3 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -297,10 +297,10 @@ export class ColorPicker extends Component {
                       );
                     }}
                   />
-                  <p>%</p>
+                  <p className="-ml-1 w-2">%</p>
                 </div>
                 <div className="flex flex-row gap-2">
-                  <p>V:</p>
+                  <p className="w-3">V:</p>
                   <input
                     type="number"
                     className="bg-beige-700 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] h-4 rounded-md w-10 outline-none px-1 py-3 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -322,14 +322,14 @@ export class ColorPicker extends Component {
                       );
                     }}
                   />
-                  <p>%</p>
+                  <p className="-ml-1 w-2">%</p>
                 </div>
               </div>
 
               {/* RGB input */}
               <div className="flex flex-col gap-2">
                 <div className="flex flex-row gap-2">
-                  <p>R:</p>
+                  <p className="w-3">R:</p>
                   <input
                     type="number"
                     className="bg-beige-700 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] h-4 rounded-md w-10 outline-none px-1 py-3 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -349,7 +349,7 @@ export class ColorPicker extends Component {
                   />
                 </div>
                 <div className="flex flex-row gap-2">
-                  <p>G:</p>
+                  <p className="w-3">G:</p>
                   <input
                     type="number"
                     className="bg-beige-700 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] h-4 rounded-md w-10 outline-none px-1 py-3 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -369,7 +369,7 @@ export class ColorPicker extends Component {
                   />
                 </div>
                 <div className="flex flex-row gap-2">
-                  <p>B:</p>
+                  <p className="w-3">B:</p>
                   <input
                     type="number"
                     className="bg-beige-700 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] h-4 rounded-md w-10 outline-none px-1 py-3 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -392,7 +392,7 @@ export class ColorPicker extends Component {
 
               {/* HEX input */}
               <div className="flex flex-row gap-1">
-                <p>#</p>
+                <p className="w-3">#</p>
                 <input
                   type="text"
                   maxLength={6}
