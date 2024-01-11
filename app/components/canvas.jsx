@@ -9,6 +9,9 @@ import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 import { ColorPicker } from "./colorPicker";
 
+import getCanvasPixelColor from "get-canvas-pixel-color";
+import { rgb2hex } from "../utils/colors";
+
 export default class DrawingCanvas extends React.Component {
   constructor(props) {
     super(props);
@@ -176,6 +179,12 @@ export default class DrawingCanvas extends React.Component {
             size: this.state.brushSize,
             opacity: this.state.brushOpacity,
           });
+        } else if (this.state.tool == "Color Picker") {
+          const cbr = this.canvas.getBoundingClientRect();
+          const cx = Math.round(e.clientX - cbr.x);
+          const cy = Math.round(e.clientY - cbr.y);
+          const { r, g, b } = getCanvasPixelColor(this.canvas, cx, cy);
+          this.setState({ brushColor: rgb2hex(r, g, b) });
         }
         this.drawCanvas();
       }
@@ -267,8 +276,6 @@ export default class DrawingCanvas extends React.Component {
     this.canvas.isSpacePressed = false;
     document.addEventListener("keydown", (e) => {
       if (e.ctrlKey) {
-        if (e.key == "=" && e.key == "-") return e.preventDefault();
-
         if (e.key == "=") {
           e.preventDefault();
           let i = 0;
@@ -565,6 +572,10 @@ export default class DrawingCanvas extends React.Component {
               text: "Line",
               icon: "bi-slash-lg",
             },
+            {
+              text: "Color Picker",
+              icon: "bi-eyedropper",
+            },
           ].map((e, i) => (
             <button
               key={i}
@@ -624,102 +635,106 @@ export default class DrawingCanvas extends React.Component {
               <i className={e.icon}></i>
             </button>
           ))}
-          {["Draw", "Erase", "Line"].includes(this.state.tool) && (
+          {["Draw", "Erase", "Line", "Color Picker"].includes(
+            this.state.tool
+          ) && (
             <>
               <div className="border-l border-beige-700 h-8 w-0"></div>
-              <div className="relative">
-                <button
-                  data-tooltip-id="toolbar-tooltip"
-                  data-tooltip-content="Brush settings"
-                  className={
-                    "w-12 h-8 hover:bg-[#fff4] rounded flex flex-row items-center justify-center pb-0.5"
-                  }
-                  onClick={() => {
-                    this.setState({
-                      brushMenuVisible: !this.state.brushMenuVisible,
-                    });
-                  }}
-                >
-                  <div className="w-8 h-8 gap-px flex flex-col items-center justify-center">
-                    <div className="w-4 h-4 flex justify-center items-center">
-                      <div
-                        className="rounded-full bg-beige-200"
-                        style={{
-                          width: `${
-                            (clamp(
-                              this.state.tool == "Erase"
-                                ? this.state.eraserSize
-                                : this.state.brushSize,
-                              1,
+              {this.state.tool != "Color Picker" && (
+                <div className="relative">
+                  <button
+                    data-tooltip-id="toolbar-tooltip"
+                    data-tooltip-content="Brush settings"
+                    className={
+                      "w-12 h-8 hover:bg-[#fff4] rounded flex flex-row items-center justify-center pb-0.5"
+                    }
+                    onClick={() => {
+                      this.setState({
+                        brushMenuVisible: !this.state.brushMenuVisible,
+                      });
+                    }}
+                  >
+                    <div className="w-8 h-8 gap-px flex flex-col items-center justify-center">
+                      <div className="w-4 h-4 flex justify-center items-center">
+                        <div
+                          className="rounded-full bg-beige-200"
+                          style={{
+                            width: `${
+                              (clamp(
+                                this.state.tool == "Erase"
+                                  ? this.state.eraserSize
+                                  : this.state.brushSize,
+                                1,
+                                100
+                              ) *
+                                16) /
                               100
-                            ) *
-                              16) /
-                            100
-                          }px`,
-                          height: `${
-                            (clamp(
-                              this.state.tool == "Erase"
-                                ? this.state.eraserSize
-                                : this.state.brushSize,
-                              1,
+                            }px`,
+                            height: `${
+                              (clamp(
+                                this.state.tool == "Erase"
+                                  ? this.state.eraserSize
+                                  : this.state.brushSize,
+                                1,
+                                100
+                              ) *
+                                16) /
                               100
-                            ) *
-                              16) /
-                            100
-                          }px`,
-                        }}
-                      ></div>
+                            }px`,
+                          }}
+                        ></div>
+                      </div>
+                      <p className="text-[8px] h-2 w-8 align-middle">
+                        {this.state.tool == "Erase"
+                          ? this.state.eraserSize
+                          : this.state.brushSize}
+                      </p>
                     </div>
-                    <p className="text-[8px] h-2 w-8 align-middle">
-                      {this.state.tool == "Erase"
-                        ? this.state.eraserSize
-                        : this.state.brushSize}
-                    </p>
-                  </div>
-                  <i className="bi-caret-down-fill w-4 h-2 [&::before]:text-xs [&::before]:-translate-y-2"></i>
-                </button>
-                <BrushMenu
-                  visible={this.state.brushMenuVisible}
-                  onBrushSizeChangeInput={(e) => {
-                    this.state.tool == "Erase"
-                      ? this.setState({
-                          brushSize: clamp(e.target.value, 1, 100) || 1,
-                        })
-                      : this.setState({
-                          eraserSize: clamp(e.target.value, 1, 100) || 1,
-                        });
-                  }}
-                  onBrushSizeChangeSlider={(e) => {
-                    this.state.tool == "Erase"
-                      ? this.setState({
-                          eraserSize: clamp(e, 1, 100) || 1,
-                        })
-                      : this.setState({
-                          brushSize: clamp(e, 1, 100) || 1,
-                        });
-                  }}
-                  brushSize={
-                    clamp(
+                    <i className="bi-caret-down-fill w-4 h-2 [&::before]:text-xs [&::before]:-translate-y-2"></i>
+                  </button>
+                  <BrushMenu
+                    visible={this.state.brushMenuVisible}
+                    onBrushSizeChangeInput={(e) => {
                       this.state.tool == "Erase"
-                        ? this.state.eraserSize
-                        : this.state.brushSize,
-                      1,
-                      100
-                    ) || 1
-                  }
-                  onBrushOpacityChangeInput={(e) => {
-                    this.setState({
-                      brushOpacity: clamp(e.target.value, 0, 100) || 100,
-                    });
-                  }}
-                  onBrushOpacityChangeSlider={(e) => {
-                    this.setState({
-                      brushOpacity: clamp(e, 0, 100) || 100,
-                    });
-                  }}
-                  brushOpacity={clamp(this.state.brushOpacity, 0, 100) || 100}
-                />
-              </div>
+                        ? this.setState({
+                            brushSize: clamp(e.target.value, 1, 100) || 1,
+                          })
+                        : this.setState({
+                            eraserSize: clamp(e.target.value, 1, 100) || 1,
+                          });
+                    }}
+                    onBrushSizeChangeSlider={(e) => {
+                      this.state.tool == "Erase"
+                        ? this.setState({
+                            eraserSize: clamp(e, 1, 100) || 1,
+                          })
+                        : this.setState({
+                            brushSize: clamp(e, 1, 100) || 1,
+                          });
+                    }}
+                    brushSize={
+                      clamp(
+                        this.state.tool == "Erase"
+                          ? this.state.eraserSize
+                          : this.state.brushSize,
+                        1,
+                        100
+                      ) || 1
+                    }
+                    onBrushOpacityChangeInput={(e) => {
+                      this.setState({
+                        brushOpacity: clamp(e.target.value, 0, 100) || 100,
+                      });
+                    }}
+                    onBrushOpacityChangeSlider={(e) => {
+                      this.setState({
+                        brushOpacity: clamp(e, 0, 100) || 100,
+                      });
+                    }}
+                    brushOpacity={clamp(this.state.brushOpacity, 0, 100) || 100}
+                  />
+                </div>
+              )}
               <button
                 className="w-6 h-6 rounded-full"
                 style={{
@@ -731,7 +746,7 @@ export default class DrawingCanvas extends React.Component {
                   });
                 }}
                 data-tooltip-id="toolbar-tooltip"
-                data-tooltip-content="Color picker"
+                data-tooltip-content="Color"
               ></button>
             </>
           )}
