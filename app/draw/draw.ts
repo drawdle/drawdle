@@ -6,6 +6,8 @@ app
 		background: 0x5b564d,
 		resizeTo: document.getElementById("canvas-container") as HTMLDivElement,
 		antialias: true,
+		autoDensity: true,
+		resolution: 2,
 	})
 	.then(() => {
 		document.getElementById("canvas-container")?.appendChild(app.canvas);
