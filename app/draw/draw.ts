@@ -24,12 +24,21 @@ app
 			disableOnContextMenu: true,
 			stopPropagation: true,
 			passiveWheel: false,
+			allowPreserveDragOutside: true,
 		});
 		viewport.drag().pinch().wheel().decelerate();
 		app.stage.addChild(viewport);
-		document.addEventListener("touchstart", (e) => e.preventDefault(), {
-			passive: false,
+		window.addEventListener("resize", () => {
+			app.renderer.resize(window.innerWidth, window.innerHeight);
+			viewport.resize(window.innerWidth, window.innerHeight);
 		});
+		document.addEventListener(
+			"touchstart",
+			(e) => {
+				e.preventDefault();
+			},
+			{ passive: false }
+		);
 		main(viewport);
 	});
 
