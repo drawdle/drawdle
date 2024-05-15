@@ -1,5 +1,4 @@
 "use client";
-import Script from "next/script.js";
 import { Component } from "react";
 
 export default class Draw extends Component {
