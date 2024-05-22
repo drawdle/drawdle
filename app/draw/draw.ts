@@ -2,6 +2,11 @@ import * as PIXI from "pixi.js";
 import { DropShadowFilter } from "pixi-filters";
 import { Viewport } from "pixi-viewport";
 
+const params = {
+	tool: "brush",
+	color: 0x000000,
+};
+
 const app = new PIXI.Application();
 app
 	.init({
@@ -63,4 +68,12 @@ function main(viewport: Viewport) {
 		}),
 	];
 	container.addChild(paper);
+}
+
+export function setTool(tool: "brush" | "eraser") {
+	params.tool = tool;
+}
+
+export interface DrawingCanvas {
+	setTool: (tool: "brush" | "eraser") => void;
 }
