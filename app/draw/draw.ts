@@ -2,10 +2,19 @@ import * as PIXI from "pixi.js";
 import { DropShadowFilter } from "pixi-filters";
 import { Viewport } from "pixi-viewport";
 
+type Tool = "brush" | "eraser" | "pan";
+type PanMode = "pan-zoom" | "none";
+
 const params = {
 	tool: "brush",
 	color: 0x000000,
+	isPanning: false,
 };
+
+let _setPanMode = (_: "pan-zoom" | "none") => {};
+export function setPanMode(mode: "pan-zoom" | "none") {
+	_setPanMode(mode);
+}
 
 const app = new PIXI.Application();
 app
@@ -31,7 +40,6 @@ app
 			passiveWheel: false,
 			allowPreserveDragOutside: true,
 		});
-		viewport.drag().pinch().wheel().decelerate();
 		app.stage.addChild(viewport);
 		window.addEventListener("resize", () => {
 			app.renderer.resize(window.innerWidth, window.innerHeight);
@@ -48,6 +56,42 @@ app
 	});
 
 function main(viewport: Viewport) {
+	// viewport.drag({ factor: 0 }).pinch({ factor: 0 }).wheel({ percent: 0 });
+	viewport.drag({ pressDrag: false }).pinch().wheel().decelerate();
+	_setPanMode = (mode: "pan-zoom" | "none") => {
+		if (mode === "pan-zoom") {
+			viewport.drag().pinch().wheel().decelerate();
+		} else {
+			viewport.drag({ pressDrag: false }).pinch().wheel().decelerate();
+		}
+	};
+
+	// pan and zoom
+	const activePointers: { id: number; x: number; y: number }[] = [];
+	viewport.on("touchstart", (e) => {
+		activePointers.push({
+			id: e.pointerId,
+			x: e.x,
+			y: e.y,
+		});
+		if (activePointers.length >= 2) {
+			params.isPanning = true;
+		} else {
+			params.isPanning = false;
+		}
+	});
+	viewport.on("touchend", (e) => {
+		activePointers.splice(
+			activePointers.findIndex((p) => p.id === e.pointerId),
+			1
+		);
+		if (activePointers.length >= 2) {
+			params.isPanning = true;
+		} else {
+			params.isPanning = false;
+		}
+	});
+
 	const container = new PIXI.Container();
 	viewport.addChild(container);
 
@@ -68,12 +112,63 @@ function main(viewport: Viewport) {
 		}),
 	];
 	container.addChild(paper);
+
+	// drawing
+	const drawingLayer = new PIXI.Container();
+	container.addChild(drawingLayer);
+	viewport.interactive = true;
+	let isPointerDown = false;
+	viewport.addEventListener("pointerdown", (e) => {
+		if (params.isPanning) return;
+
+		isPointerDown = true;
+		if (["brush", "eraser"].includes(params.tool)) {
+			drawingLayer.addChild(
+				new PIXI.Graphics()
+					.setStrokeStyle({
+						color: params.color,
+						cap: "round",
+						join: "round",
+					})
+					.moveTo(
+						(e.clientX - viewport.x) / viewport.scale.x,
+						(e.clientY - viewport.y) / viewport.scale.y
+					)
+			);
+		}
+	});
+	viewport.addEventListener("pointerup", (e) => {
+		isPointerDown = false;
+	});
+	viewport.on("pointermove", (e) => {
+		if (params.isPanning) return;
+
+		if (["brush", "eraser"].includes(params.tool) && isPointerDown) {
+			const currentLine = drawingLayer.children.findLast(
+				(c) => c instanceof PIXI.Graphics
+			) as PIXI.Graphics;
+			currentLine
+				.lineTo(
+					(e.clientX - viewport.x) / viewport.scale.x,
+					(e.clientY - viewport.y) / viewport.scale.y
+				)
+				.stroke();
+		}
+	});
 }
 
-export function setTool(tool: "brush" | "eraser") {
+export function setTool(tool: Tool) {
 	params.tool = tool;
+	if (tool === "pan") {
+		setPanMode("pan-zoom");
+	}
+	if (["brush", "eraser"].includes(tool)) {
+		setPanMode("none");
+		params.color = tool === "brush" ? 0x000000 : 0xffffff;
+	}
 }
 
 export interface DrawingCanvas {
-	setTool: (tool: "brush" | "eraser") => void;
+	setTool: (tool: Tool) => void;
+	setPanMode: (mode: PanMode) => void;
 }
