@@ -67,13 +67,9 @@ function main(viewport: Viewport) {
 	};
 
 	// pan and zoom
-	const activePointers: { id: number; x: number; y: number }[] = [];
+	const activePointers: number[] = [];
 	viewport.on("touchstart", (e) => {
-		activePointers.push({
-			id: e.pointerId,
-			x: e.x,
-			y: e.y,
-		});
+		activePointers.push(e.pointerId);
 		if (activePointers.length >= 2) {
 			params.isPanning = true;
 		} else {
@@ -81,10 +77,7 @@ function main(viewport: Viewport) {
 		}
 	});
 	viewport.on("touchend", (e) => {
-		activePointers.splice(
-			activePointers.findIndex((p) => p.id === e.pointerId),
-			1
-		);
+		activePointers.splice(activePointers.indexOf(e.pointerId), 1);
 		if (activePointers.length >= 2) {
 			params.isPanning = true;
 		} else {
