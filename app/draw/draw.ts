@@ -111,6 +111,11 @@ function main(viewport: Viewport) {
 	// drawing
 	const drawingLayer = new PIXI.Container();
 	container.addChild(drawingLayer);
+	const mask = new PIXI.Graphics().rect(-320, -240, 640, 480).fill(0xffffff);
+	mask.position.set(window.innerWidth / 2, window.innerHeight / 2);
+	drawingLayer.addChild(mask);
+	drawingLayer.mask = mask;
+
 	viewport.interactive = true;
 	let isPointerDown = false;
 	viewport.addEventListener("pointerdown", (e) => {
