@@ -10,6 +10,8 @@ interface IState {
 	isReady: boolean;
 	drawingCanvas: DrawingCanvas | null;
 	currentTool: "brush" | "eraser" | "pan";
+	brushSize: number;
+	eraserSize: number;
 }
 
 export default class Draw extends Component<IProps, IState> {
@@ -20,6 +22,8 @@ export default class Draw extends Component<IProps, IState> {
 			isReady: false,
 			drawingCanvas: null,
 			currentTool: "brush",
+			brushSize: 1,
+			eraserSize: 5,
 		};
 	}
 	async componentDidMount() {
@@ -91,9 +95,9 @@ export default class Draw extends Component<IProps, IState> {
 									this.setState({ currentTool: "pan" });
 								},
 							},
-						].map(({ name, icon, tool, onClick }, i) => (
+						].map(({ name, icon, tool, onClick }) => (
 							<button
-								key={i}
+								key={name}
 								type="button"
 								onPointerDown={onClick}
 								className="bg-transparent hover:bg-[#fff4_!important] rounded-md w-8 h-8 transition-colors"
@@ -104,6 +108,64 @@ export default class Draw extends Component<IProps, IState> {
 								<i key={name} className={`bi ${icon}`} />
 							</button>
 						))}
+						{["brush", "eraser"].includes(this.state.currentTool) && (
+							<div className="flex gap-0.5 bg-beige-900">
+								<button
+									type="button"
+									className="hover:bg-beige-800 rounded-md w-8 h-8"
+									onClick={() => {
+										const s = Math.min(
+											100,
+											Math.max(1, this.state.brushSize - 1)
+										);
+										this.state.currentTool === "eraser"
+											? this.setState({ eraserSize: s })
+											: this.setState({ brushSize: s });
+										this.state.drawingCanvas?.setSize(s);
+									}}
+								>
+									-
+								</button>
+								<input
+									type="number"
+									className="bg-beige-800 border border-transparent focus:border-beige-700 rounded-md w-10 text-center text-sm outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+									value={
+										this.state.currentTool === "eraser"
+											? this.state.eraserSize
+											: this.state.brushSize
+									}
+									onChange={(e) => {
+										if (Number.parseInt(e.target.value) > 0) {
+											const s = Math.min(
+												100,
+												Math.max(1, Number.parseInt(e.target.value))
+											);
+											this.state.currentTool === "eraser"
+												? this.setState({ eraserSize: s })
+												: this.setState({ brushSize: s });
+
+											this.state.drawingCanvas?.setSize(s);
+										}
+									}}
+								/>
+								<button
+									type="button"
+									className="hover:bg-beige-800 rounded-md w-8 h-8"
+									onClick={() => {
+										const s = Math.min(
+											100,
+											Math.max(1, this.state.brushSize + 1)
+										);
+										this.state.currentTool === "eraser"
+											? this.setState({ eraserSize: s })
+											: this.setState({ brushSize: s });
+										this.state.drawingCanvas?.setSize(s);
+									}}
+								>
+									+
+								</button>
+							</div>
+						)}
 					</div>
 				</Draggable>
 			</main>

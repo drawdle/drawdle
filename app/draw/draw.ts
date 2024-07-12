@@ -9,6 +9,8 @@ const params = {
 	tool: "brush",
 	color: 0x000000,
 	isPanning: false,
+	brushSize: 1,
+	eraserSize: 5,
 };
 
 let _setPanMode = (_: "pan-zoom" | "none") => {};
@@ -122,6 +124,8 @@ function main(viewport: Viewport) {
 						color: params.color,
 						cap: "round",
 						join: "round",
+						width:
+							params.tool === "eraser" ? params.eraserSize : params.brushSize,
 					})
 					.moveTo(
 						(e.clientX - viewport.x) / viewport.scale.x,
@@ -161,7 +165,16 @@ export function setTool(tool: Tool) {
 	}
 }
 
+export function setSize(size: number) {
+	if (params.tool === "brush") {
+		params.brushSize = size;
+	} else if (params.tool === "eraser") {
+		params.eraserSize = size;
+	}
+}
+
 export interface DrawingCanvas {
 	setTool: (tool: Tool) => void;
 	setPanMode: (mode: PanMode) => void;
+	setSize: (size: number) => void;
 }
