@@ -109,7 +109,8 @@ export default class Draw extends Component<IProps, IState> {
 							</button>
 						))}
 						{["brush", "eraser"].includes(this.state.currentTool) && (
-							<div className="flex gap-0.5 bg-beige-900">
+							<div className="flex gap-0.5">
+								<div className="mr-0.5 border-beige-800 border-l h-6 self-center" />
 								<button
 									type="button"
 									className="hover:bg-beige-800 rounded-md w-8 h-8"
@@ -164,6 +165,15 @@ export default class Draw extends Component<IProps, IState> {
 								>
 									+
 								</button>
+							</div>
+						)}
+						{this.state.currentTool === "brush" && (
+							<div className="flex gap-0.5">
+								<div className="mr-0.5 border-beige-800 border-l h-6 self-center" />
+								<button
+									type="button"
+									className="bg-black mx-1.5 rounded-full w-7 h-7"
+								/>
 							</div>
 						)}
 					</div>
