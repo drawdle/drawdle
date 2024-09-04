@@ -15,6 +15,8 @@ const params = {
 
 const tension = 1;
 
+const allLines: { x: number; y: number }[][] = [];
+
 let _setPanMode = (_: "pan-zoom" | "none") => {};
 export function setPanMode(mode: "pan-zoom" | "none") {
 	_setPanMode(mode);
@@ -169,6 +171,7 @@ function main(viewport: Viewport) {
 	});
 	viewport.addEventListener("pointerup", (e) => {
 		isPointerDown = false;
+		allLines.push(points);
 	});
 	viewport.on("pointermove", (e) => {
 		if (params.isPanning) return;
