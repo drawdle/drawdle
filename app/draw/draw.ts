@@ -1,6 +1,7 @@
 import * as PIXI from "pixi.js";
 import { DropShadowFilter } from "pixi-filters";
 import { Viewport } from "pixi-viewport";
+import type { HexColor } from "@/utils/color";
 
 type Tool = "brush" | "eraser" | "pan";
 type PanMode = "pan-zoom" | "none";
@@ -205,8 +206,13 @@ export function setSize(size: number) {
 	}
 }
 
+export function setColor(color: HexColor) {
+	params.color = Number.parseInt(color.replaceAll("#", ""), 16);
+}
+
 export interface DrawingCanvas {
 	setTool: (tool: Tool) => void;
 	setPanMode: (mode: PanMode) => void;
 	setSize: (size: number) => void;
+	setColor(color: HexColor): void;
 }

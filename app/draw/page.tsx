@@ -5,7 +5,7 @@ import Draggable from "react-draggable";
 import type { DrawingCanvas } from "./draw.ts";
 import { LoadingSpinner } from "@/components/LoadingSpinner.tsx";
 import { ColorPicker } from "@/components/ColorPicker.tsx";
-import { HexColor } from "@/utils/color.ts";
+import type { HexColor } from "@/utils/color.ts";
 
 type IProps = Readonly<Record<string, unknown>>;
 interface IState {
@@ -16,7 +16,7 @@ interface IState {
 	eraserSize: number;
 
 	showColorPicker: boolean;
-	brushColor: HexColor;
+	color: HexColor;
 }
 
 export default class Draw extends Component<IProps, IState> {
@@ -31,7 +31,7 @@ export default class Draw extends Component<IProps, IState> {
 			eraserSize: 5,
 
 			showColorPicker: false,
-			brushColor: "#000000",
+			color: "#000000",
 		};
 	}
 	async componentDidMount() {
@@ -188,7 +188,7 @@ export default class Draw extends Component<IProps, IState> {
 										type="button"
 										className="mx-1.5 rounded-full w-7 h-7"
 										style={{
-											background: this.state.brushColor,
+											background: this.state.color,
 										}}
 										onClick={() => {
 											this.setState({ showColorPicker: true });
@@ -201,10 +201,11 @@ export default class Draw extends Component<IProps, IState> {
 				</main>
 				{this.state.showColorPicker && (
 					<ColorPicker
-						color={this.state.brushColor}
-						updateColor={() =>
-							this.setState({ brushColor: this.state.brushColor })
-						}
+						color={this.state.color}
+						updateColor={(color) => {
+							this.setState({ color: color });
+							this.state.drawingCanvas?.setColor(color);
+						}}
 						onClose={() => this.setState({ showColorPicker: false })}
 						visible={this.state.showColorPicker}
 					/>
