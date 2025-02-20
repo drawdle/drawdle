@@ -239,23 +239,23 @@ export class ColorPicker extends Component<IProps, IState> {
 		return (
 			<>
 				{this.props.visible && (
-					<div className="top-0 left-0 z-[9999] fixed flex flex-row justify-center items-center bg-beige-900 bg-opacity-50 w-[100vw] h-[100vh] select-none">
+					<div className="top-0 left-0 z-9999 fixed flex flex-row justify-center items-center bg-beige-900/50 w-[100vw] h-[100vh] select-none">
 						<div className="flex flex-col justify-center items-center gap-8 bg-beige-800 rounded-lg w-[calc(144rem/4)] h-96 text-beige-200">
 							<div className="flex flex-row gap-4 mt-4 w-128 h-64">
 								{/* Saturation and luminosity 2D slider */}
 								<div
-									className="rounded w-64 h-64 select-none"
+									className="rounded-sm w-64 h-64 select-none"
 									style={{
 										background: `hsl(${this.state.hue}, 100%, 50%)`,
 									}}
 									draggable={false}
 								>
 									<div
-										className="bg-gradient-to-r from-white to-transparent rounded w-full h-full"
+										className="bg-linear-to-r from-white to-transparent rounded-sm w-full h-full"
 										draggable={false}
 									>
 										<div
-											className="relative bg-gradient-to-t from-black to-transparent rounded w-full h-full slider2d"
+											className="relative bg-linear-to-t from-black to-transparent rounded-sm w-full h-full slider2d"
 											draggable={false}
 										>
 											<div
@@ -280,7 +280,7 @@ export class ColorPicker extends Component<IProps, IState> {
 
 								{/* Hue slider */}
 								<div
-									className="relative rounded w-8 h-64 select-none slider1d vertical-rainbow"
+									className="relative rounded-sm w-8 h-64 select-none slider1d vertical-rainbow"
 									draggable={false}
 								>
 									<div
@@ -299,7 +299,7 @@ export class ColorPicker extends Component<IProps, IState> {
 											<p className="w-3">H:</p>
 											<input
 												type="number"
-												className="border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] bg-beige-700 px-1 py-3 border rounded w-10 h-4 text-sm outline-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+												className="border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] outline-hidden bg-beige-700 px-1 py-3 border rounded-sm w-10 h-4 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
 												min={0}
 												max={360}
 												value={Math.round(this.state.hue).toString()}
@@ -326,7 +326,7 @@ export class ColorPicker extends Component<IProps, IState> {
 											<p className="w-3">S:</p>
 											<input
 												type="number"
-												className="border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] bg-beige-700 px-1 py-3 border rounded-md w-10 h-4 text-sm outline-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+												className="border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] outline-hidden bg-beige-700 px-1 py-3 border rounded-md w-10 h-4 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
 												min={0}
 												max={100}
 												value={Math.round(this.state.saturation).toString()}
@@ -355,7 +355,7 @@ export class ColorPicker extends Component<IProps, IState> {
 											<p className="w-3">V:</p>
 											<input
 												type="number"
-												className="border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] bg-beige-700 px-1 py-3 border rounded-md w-10 h-4 text-sm outline-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+												className="border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] outline-hidden bg-beige-700 px-1 py-3 border rounded-md w-10 h-4 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
 												min={0}
 												max={100}
 												value={Math.round(this.state.value).toString()}
@@ -388,7 +388,7 @@ export class ColorPicker extends Component<IProps, IState> {
 											<p className="w-3">R:</p>
 											<input
 												type="number"
-												className="border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] bg-beige-700 px-1 py-3 border rounded-md w-10 h-4 text-sm outline-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+												className="border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] outline-hidden bg-beige-700 px-1 py-3 border rounded-md w-10 h-4 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
 												min={0}
 												max={255}
 												value={Math.round(this.state.rgb.r).toString()}
@@ -408,7 +408,7 @@ export class ColorPicker extends Component<IProps, IState> {
 											<p className="w-3">G:</p>
 											<input
 												type="number"
-												className="border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] bg-beige-700 px-1 py-3 border rounded-md w-10 h-4 text-sm outline-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+												className="border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] outline-hidden bg-beige-700 px-1 py-3 border rounded-md w-10 h-4 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
 												min={0}
 												max={255}
 												value={Math.round(this.state.rgb.g).toString()}
@@ -428,7 +428,7 @@ export class ColorPicker extends Component<IProps, IState> {
 											<p className="w-3">B:</p>
 											<input
 												type="number"
-												className="border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] bg-beige-700 px-1 py-3 border rounded-md w-10 h-4 text-sm outline-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+												className="border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] outline-hidden bg-beige-700 px-1 py-3 border rounded-md w-10 h-4 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
 												min={0}
 												max={255}
 												value={Math.round(this.state.rgb.b).toString()}
@@ -452,7 +452,7 @@ export class ColorPicker extends Component<IProps, IState> {
 										<input
 											type="text"
 											maxLength={6}
-											className="border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] bg-beige-700 px-1 py-3 border rounded-md w-24 h-4 text-sm outline-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+											className="border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] outline-hidden bg-beige-700 px-1 py-3 border rounded-md w-24 h-4 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
 											value={this.state.hex}
 											onChange={(e) => {
 												const newHex = e.target.value;

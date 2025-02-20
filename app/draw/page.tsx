@@ -152,7 +152,7 @@ export default class Draw extends Component<IProps, IState> {
 									</button>
 									<input
 										type="number"
-										className="bg-beige-800 border border-transparent focus:border-beige-700 rounded-md w-10 text-center text-sm outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+										className="bg-beige-800 border border-transparent focus:border-beige-700 rounded-md w-10 text-center text-sm outline-hidden [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
 										value={
 											this.state.currentTool === "eraser"
 												? this.state.eraserSize
