@@ -523,7 +523,7 @@ export class ColorPicker extends Component<IProps, IState> {
 									className="bg-transparent hover:bg-beige-400 px-4 py-1 border border-beige-400 rounded-full w-24 hover:text-beige-900 transition-colors"
 									onClick={() => {
 										if (this.props.updateColor)
-											this.props.updateColor(this.state.hex);
+											this.props.updateColor(`#${this.state.hex}`);
 										if (this.props.onClose) this.props.onClose();
 									}}
 								>
