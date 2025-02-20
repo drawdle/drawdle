@@ -14,7 +14,8 @@ const params = {
 	eraserSize: 5,
 };
 
-const tension = 1;
+const tension = 1; // bezier curve control point strength
+const newPointThreshold = 4; // how far each point has to be from each other
 
 const allLines: { x: number; y: number }[][] = [];
 
@@ -170,14 +171,25 @@ function main(viewport: Viewport) {
 			];
 		}
 	});
+	let lastPoint = { x: 0, y: 0 };
 	viewport.addEventListener("pointerup", (e) => {
 		isPointerDown = false;
 		allLines.push(points);
 	});
 	viewport.on("pointermove", (e) => {
 		if (params.isPanning) return;
+		if (
+			// cursed hypotenuse distance approximation for small numbers
+			0.7 *
+				(Math.abs(lastPoint.x - e.clientX) +
+					Math.abs(lastPoint.y - e.clientY)) <
+			newPointThreshold
+		) {
+			return;
+		}
 
 		if (["brush", "eraser"].includes(params.tool) && isPointerDown) {
+			lastPoint = { x: e.clientX, y: e.clientY };
 			points.push({
 				x: (e.clientX - viewport.x) / viewport.scale.x,
 				y: (e.clientY - viewport.y) / viewport.scale.y,
