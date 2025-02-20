@@ -1,5 +1,5 @@
 "use client";
-import { Component } from "react";
+import { Component, createRef, type RefObject } from "react";
 import Draggable from "react-draggable";
 
 import type { DrawingCanvas } from "./draw.ts";
@@ -20,8 +20,10 @@ interface IState {
 }
 
 export default class Draw extends Component<IProps, IState> {
-	constructor() {
-		super({});
+	toolbarRef: RefObject<HTMLDivElement | null>;
+
+	constructor(props: IProps) {
+		super(props);
 
 		this.state = {
 			isReady: false,
@@ -33,6 +35,8 @@ export default class Draw extends Component<IProps, IState> {
 			showColorPicker: false,
 			color: "#000000",
 		};
+
+		this.toolbarRef = createRef<HTMLDivElement>();
 	}
 	async componentDidMount() {
 		const drawingCanvas = await import("./draw.ts");
@@ -51,6 +55,10 @@ export default class Draw extends Component<IProps, IState> {
 					)}
 					<div id="canvas-container" className="w-full h-full" />
 					<Draggable
+						offsetParent={
+							typeof document !== "undefined" ? document.body : undefined
+						}
+						nodeRef={this.toolbarRef as RefObject<HTMLElement>}
 						handle=".handle"
 						defaultPosition={{ x: 12, y: 12 }}
 						defaultClassName="fixed top-0 left-0"
@@ -73,7 +81,8 @@ export default class Draw extends Component<IProps, IState> {
 					>
 						<div
 							id="toolbar"
-							className="flex justify-stretch items-center gap-1 bg-beige-900 shadow-xl p-1 rounded-md min-w-20 h-10 text-beige-500 text-center text-xl"
+							className="flex justify-stretch items-center gap-1 bg-beige-900 shadow-xl p-1 rounded-md min-w-20 h-10 text-beige-500 text-center text-xl select-none"
+							ref={this.toolbarRef}
 						>
 							<i className="bi-grip-vertical w-4 cursor-move bi handle" />
 							{[
