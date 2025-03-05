@@ -17,7 +17,11 @@ const params = {
 const tension = 1; // bezier curve control point strength
 const newPointThreshold = 4; // how far each point has to be from each other
 
-const allLines: { x: number; y: number }[][] = [];
+const canvasObjects: {
+	points: { x: number; y: number }[];
+	color: number;
+	size: number;
+}[] = [];
 
 let _setPanMode = (_: "pan-zoom" | "none") => {};
 export function setPanMode(mode: "pan-zoom" | "none") {
@@ -115,7 +119,7 @@ function main(viewport: Viewport) {
 	container.addChild(paper);
 
 	// drawing
-	let points: { x: number; y: number }[] = [];
+	let currentLinePoints: { x: number; y: number }[] = [];
 	const drawingLayer = new PIXI.Container();
 	container.addChild(drawingLayer);
 	const mask = new PIXI.Graphics().rect(-320, -240, 640, 480).fill(0xffffff);
@@ -128,13 +132,14 @@ function main(viewport: Viewport) {
 			(c) => c instanceof PIXI.Graphics
 		) as PIXI.Graphics;
 		line.clear();
-		line.moveTo(points[0].x, points[0].y);
+		line.moveTo(currentLinePoints[0].x, currentLinePoints[0].y);
 		// https://stackoverflow.com/a/49371349
-		for (let i = 1; i < points.length - 1; i++) {
-			const p0 = i > 0 ? points[i - 1] : points[0];
-			const p1 = points[i];
-			const p2 = points[i + 1];
-			const p3 = i !== points.length - 2 ? points[i + 2] : p2;
+		for (let i = 1; i < currentLinePoints.length - 1; i++) {
+			const p0 = i > 0 ? currentLinePoints[i - 1] : currentLinePoints[0];
+			const p1 = currentLinePoints[i];
+			const p2 = currentLinePoints[i + 1];
+			const p3 =
+				i !== currentLinePoints.length - 2 ? currentLinePoints[i + 2] : p2;
 
 			const cp1x = p1.x + ((p2.x - p0.x) / 6) * tension;
 			const cp1y = p1.y + ((p2.y - p0.y) / 6) * tension;
@@ -163,18 +168,23 @@ function main(viewport: Viewport) {
 						params.tool === "eraser" ? params.eraserSize : params.brushSize,
 				})
 			);
-			points = [
+			currentLinePoints = [
 				{
 					x: (e.clientX - viewport.x) / viewport.scale.x,
 					y: (e.clientY - viewport.y) / viewport.scale.y,
 				},
 			];
+			canvasObjects.push({
+				points: [],
+				color: params.color,
+				size: params.tool === "eraser" ? params.eraserSize : params.brushSize,
+			});
 		}
 	});
 	let lastPoint = { x: 0, y: 0 };
 	viewport.addEventListener("pointerup", (e) => {
 		isPointerDown = false;
-		allLines.push(points);
+		canvasObjects[canvasObjects.length - 1].points = currentLinePoints;
 	});
 	viewport.on("pointermove", (e) => {
 		if (params.isPanning) return;
@@ -190,7 +200,7 @@ function main(viewport: Viewport) {
 
 		if (["brush", "eraser"].includes(params.tool) && isPointerDown) {
 			lastPoint = { x: e.clientX, y: e.clientY };
-			points.push({
+			currentLinePoints.push({
 				x: (e.clientX - viewport.x) / viewport.scale.x,
 				y: (e.clientY - viewport.y) / viewport.scale.y,
 			});
