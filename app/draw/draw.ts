@@ -17,11 +17,23 @@ const params = {
 const tension = 1; // bezier curve control point strength
 const newPointThreshold = 4; // how far each point has to be from each other
 
-const canvasObjects: {
+type CanvasObjectsList = {
 	points: { x: number; y: number }[];
 	color: number;
 	size: number;
-}[] = [];
+	disabled: boolean;
+	id: number;
+}[];
+const canvasObjects: CanvasObjectsList = [];
+const originalCanvasObjectsPush = canvasObjects.push.bind(canvasObjects);
+canvasObjects.push = (...args) => {
+	canvasObjects.splice(
+		0,
+		canvasObjects.length,
+		...canvasObjects.filter((c) => !c.disabled)
+	);
+	return originalCanvasObjectsPush(...args);
+};
 
 let _setPanMode = (_: "pan-zoom" | "none") => {};
 export function setPanMode(mode: "pan-zoom" | "none") {
@@ -168,6 +180,9 @@ function main(viewport: Viewport) {
 						params.tool === "eraser" ? params.eraserSize : params.brushSize,
 				})
 			);
+			const newLine = drawingLayer.children.findLast(
+				(c) => c instanceof PIXI.Graphics
+			) as PIXI.Graphics;
 			currentLinePoints = [
 				{
 					x: (e.clientX - viewport.x) / viewport.scale.x,
@@ -178,6 +193,8 @@ function main(viewport: Viewport) {
 				points: [],
 				color: params.color,
 				size: params.tool === "eraser" ? params.eraserSize : params.brushSize,
+				disabled: false,
+				id: newLine.uid,
 			});
 		}
 	});
@@ -207,7 +224,35 @@ function main(viewport: Viewport) {
 			drawLine();
 		}
 	});
+
+	// undo
+	undo = () => {
+		const mostRecentObject = canvasObjects.findLast((c) => !c.disabled);
+		if (!mostRecentObject) return;
+
+		mostRecentObject.disabled = true;
+		const pixiObject = drawingLayer.children.find(
+			(c) => c.uid === mostRecentObject.id
+		);
+		if (!pixiObject) return;
+		pixiObject.visible = false;
+	};
+
+	// redo
+	redo = () => {
+		const oldestDisabledObject = canvasObjects.find((c) => c.disabled);
+		if (!oldestDisabledObject) return;
+
+		oldestDisabledObject.disabled = false;
+		const pixiObject = drawingLayer.children.find(
+			(c) => c.uid === oldestDisabledObject.id
+		);
+		if (!pixiObject) return;
+		pixiObject.visible = true;
+	};
 }
+export let undo: () => void;
+export let redo: () => void;
 
 export function setTool(tool: Tool) {
 	params.tool = tool;
@@ -237,4 +282,7 @@ export interface DrawingCanvas {
 	setPanMode: (mode: PanMode) => void;
 	setSize: (size: number) => void;
 	setColor(color: HexColor): void;
+
+	undo: () => void;
+	redo: () => void;
 }

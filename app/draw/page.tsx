@@ -87,6 +87,32 @@ export default class Draw extends Component<IProps, IState> {
 							<i className="bi-grip-vertical w-4 cursor-move bi handle" />
 							{[
 								{
+									name: "Undo",
+									icon: "bi-arrow-counterclockwise",
+									onClick: () => {
+										this.state.drawingCanvas?.undo();
+									},
+								},
+								{
+									name: "Redo",
+									icon: "bi-arrow-clockwise",
+									onClick: () => {
+										this.state.drawingCanvas?.redo();
+									},
+								},
+							].map(({ name, icon, onClick }) => (
+								<button
+									key={name}
+									type="button"
+									onPointerDown={onClick}
+									className="bg-transparent hover:bg-[#fff4_!important] rounded-md w-8 h-8 transition-colors"
+								>
+									<i key={name} className={`bi ${icon}`} />
+								</button>
+							))}
+							<div className="border-beige-800 border-l h-6" />
+							{[
+								{
 									name: "Brush",
 									icon: "bi-brush",
 									tool: "brush",
@@ -152,7 +178,7 @@ export default class Draw extends Component<IProps, IState> {
 									</button>
 									<input
 										type="number"
-										className="bg-beige-800 border border-transparent focus:border-beige-700 rounded-md w-10 text-center text-sm outline-hidden [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+										className="outline-hidden bg-beige-800 border border-transparent focus:border-beige-700 rounded-md w-10 text-center text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
 										value={
 											this.state.currentTool === "eraser"
 												? this.state.eraserSize
