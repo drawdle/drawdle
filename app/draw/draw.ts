@@ -201,6 +201,7 @@ function main(viewport: Viewport) {
 	let lastPoint = { x: 0, y: 0 };
 	viewport.addEventListener("pointerup", (e) => {
 		isPointerDown = false;
+		if (!canvasObjects[canvasObjects.length - 1]) return;
 		canvasObjects[canvasObjects.length - 1].points = currentLinePoints;
 	});
 	viewport.on("pointermove", (e) => {

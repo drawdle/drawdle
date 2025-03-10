@@ -9,6 +9,7 @@
 		"lint": "next lint"
 	},
 	"dependencies": {
+		"lucide-react": "^0.479.0",
 		"next": "^15.1.7",
 		"pixi-filters": "^6.1.0",
 		"pixi-viewport": "^6.0.3",
@@ -28,7 +29,7 @@
 		"tailwindcss": "^4.0.7",
 		"typescript": "^5.7.3"
 	},
-	"packageManager": "pnpm@10.4.1",
+	"packageManager": "pnpm@10.6.2",
 	"pnpm": {
 		"onlyBuiltDependencies": [
 			"sharp"

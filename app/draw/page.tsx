@@ -6,6 +6,7 @@ import type { DrawingCanvas } from "./draw.ts";
 import { LoadingSpinner } from "@/components/LoadingSpinner.tsx";
 import { ColorPicker } from "@/components/ColorPicker.tsx";
 import type { HexColor } from "@/utils/color.ts";
+import { Brush, Eraser, GripVertical, Move, Redo, Undo } from "lucide-react";
 
 type IProps = Readonly<Record<string, unknown>>;
 interface IState {
@@ -81,40 +82,43 @@ export default class Draw extends Component<IProps, IState> {
 					>
 						<div
 							id="toolbar"
-							className="flex justify-stretch items-center gap-1 bg-beige-900 shadow-xl p-1 rounded-md min-w-20 h-10 text-beige-500 text-center text-xl select-none"
+							className="flex justify-stretch items-center gap-1 bg-beige-900 shadow-xl p-1 rounded-md min-w-20 h-10 text-beige-500 text-xl text-center select-none"
 							ref={this.toolbarRef}
 						>
-							<i className="bi-grip-vertical w-4 cursor-move bi handle" />
+							<GripVertical className="w-4 cursor-move handle" />
 							{[
 								{
 									name: "Undo",
-									icon: "bi-arrow-counterclockwise",
+									icon: Undo,
 									onClick: () => {
 										this.state.drawingCanvas?.undo();
 									},
 								},
 								{
 									name: "Redo",
-									icon: "bi-arrow-clockwise",
+									icon: Redo,
 									onClick: () => {
 										this.state.drawingCanvas?.redo();
 									},
 								},
-							].map(({ name, icon, onClick }) => (
-								<button
-									key={name}
-									type="button"
-									onPointerDown={onClick}
-									className="bg-transparent hover:bg-[#fff4_!important] rounded-md w-8 h-8 transition-colors"
-								>
-									<i key={name} className={`bi ${icon}`} />
-								</button>
-							))}
+							].map(({ name, icon, onClick }) => {
+								const Icon = icon;
+								return (
+									<button
+										key={name}
+										type="button"
+										onPointerDown={onClick}
+										className="flex justify-center items-center bg-transparent hover:bg-[#fff4_!important] rounded-md w-8 h-8 transition-colors"
+									>
+										<Icon key={name} size={20} />
+									</button>
+								);
+							})}
 							<div className="border-beige-800 border-l h-6" />
 							{[
 								{
 									name: "Brush",
-									icon: "bi-brush",
+									icon: Brush,
 									tool: "brush",
 									onClick: () => {
 										this.state.drawingCanvas?.setTool("brush");
@@ -123,7 +127,7 @@ export default class Draw extends Component<IProps, IState> {
 								},
 								{
 									name: "Eraser",
-									icon: "bi-eraser",
+									icon: Eraser,
 									tool: "eraser",
 									onClick: () => {
 										this.state.drawingCanvas?.setTool("eraser");
@@ -132,29 +136,33 @@ export default class Draw extends Component<IProps, IState> {
 								},
 								{
 									name: "Move",
-									icon: "bi-arrows-move",
+									icon: Move,
 									tool: "pan",
 									onClick: () => {
 										this.state.drawingCanvas?.setTool("pan");
 										this.setState({ currentTool: "pan" });
 									},
 								},
-							].map(({ name, icon, tool, onClick }) => (
-								<button
-									key={name}
-									type="button"
-									onPointerDown={onClick}
-									className="bg-transparent hover:bg-[#fff4_!important] rounded-md w-8 h-8 transition-colors"
-									style={{
-										background: this.state.currentTool === tool ? "#fff2" : "",
-									}}
-								>
-									<i key={name} className={`bi ${icon}`} />
-								</button>
-							))}
+							].map(({ name, icon, tool, onClick }) => {
+								const Icon = icon;
+								return (
+									<button
+										key={name}
+										type="button"
+										onPointerDown={onClick}
+										className="flex justify-center items-center bg-transparent hover:bg-[#fff4_!important] rounded-md w-8 h-8 transition-colors"
+										style={{
+											background:
+												this.state.currentTool === tool ? "#fff2" : "",
+										}}
+									>
+										<Icon key={name} size={20} />
+									</button>
+								);
+							})}
 							{["brush", "eraser"].includes(this.state.currentTool) && (
 								<div className="flex gap-0.5">
-									<div className="mr-0.5 border-beige-800 border-l h-6 self-center" />
+									<div className="self-center mr-0.5 border-beige-800 border-l h-6" />
 									<button
 										type="button"
 										className="hover:bg-beige-800 rounded-md w-8 h-8"
@@ -178,7 +186,7 @@ export default class Draw extends Component<IProps, IState> {
 									</button>
 									<input
 										type="number"
-										className="outline-hidden bg-beige-800 border border-transparent focus:border-beige-700 rounded-md w-10 text-center text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+										className="bg-beige-800 border border-transparent focus:border-beige-700 rounded-md outline-hidden w-10 text-sm text-center [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [appearance:textfield]"
 										value={
 											this.state.currentTool === "eraser"
 												? this.state.eraserSize
@@ -218,7 +226,7 @@ export default class Draw extends Component<IProps, IState> {
 							)}
 							{this.state.currentTool === "brush" && (
 								<div className="flex gap-0.5">
-									<div className="mr-0.5 border-beige-800 border-l h-6 self-center" />
+									<div className="self-center mr-0.5 border-beige-800 border-l h-6" />
 									<button
 										type="button"
 										className="mx-1.5 rounded-full w-7 h-7"
