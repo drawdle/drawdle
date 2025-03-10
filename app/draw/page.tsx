@@ -1,18 +1,35 @@
 "use client";
-import { Component, createRef, type RefObject } from "react";
+import {
+	Component,
+	createRef,
+	ForwardRefExoticComponent,
+	JSX,
+	RefAttributes,
+	type RefObject,
+} from "react";
 import Draggable from "react-draggable";
 
 import type { DrawingCanvas } from "./draw.ts";
 import { LoadingSpinner } from "@/components/LoadingSpinner.tsx";
 import { ColorPicker } from "@/components/ColorPicker.tsx";
 import type { HexColor } from "@/utils/color.ts";
-import { Brush, Eraser, GripVertical, Move, Redo, Undo } from "lucide-react";
+import {
+	Brush,
+	Eraser,
+	GripVertical,
+	LucideProps,
+	Move,
+	Redo,
+	Undo,
+} from "lucide-react";
+
+type ITool = "brush" | "eraser" | "pan";
 
 type IProps = Readonly<Record<string, unknown>>;
 interface IState {
 	isReady: boolean;
 	drawingCanvas: DrawingCanvas | null;
-	currentTool: "brush" | "eraser" | "pan";
+	currentTool: ITool;
 	brushSize: number;
 	eraserSize: number;
 
@@ -22,6 +39,10 @@ interface IState {
 
 export default class Draw extends Component<IProps, IState> {
 	toolbarRef: RefObject<HTMLDivElement | null>;
+	keydownHandler?: (event: KeyboardEvent) => void;
+	keyupHandler?: (event: KeyboardEvent) => void;
+
+	toolBeforePan: ITool = "brush";
 
 	constructor(props: IProps) {
 		super(props);
@@ -39,10 +60,66 @@ export default class Draw extends Component<IProps, IState> {
 
 		this.toolbarRef = createRef<HTMLDivElement>();
 	}
-	async componentDidMount() {
+	async componentDidMount(): Promise<void> {
 		const drawingCanvas = await import("./draw.ts");
 		this.setState({ drawingCanvas: drawingCanvas, isReady: true });
 		drawingCanvas.setTool("brush");
+
+		let prevKey = {
+			ctrlKey: false,
+			code: "",
+		};
+		this.keydownHandler = (e) => {
+			if (e.code === prevKey.code && e.ctrlKey === prevKey.ctrlKey) return;
+			prevKey = { ctrlKey: e.ctrlKey, code: e.code };
+
+			if (e.ctrlKey) {
+				switch (e.code) {
+					case "KeyZ":
+						drawingCanvas.undo();
+						break;
+					case "KeyY":
+						drawingCanvas.redo();
+						break;
+				}
+				return;
+			}
+			switch (e.code) {
+				case "Space":
+					this.toolBeforePan = this.state.currentTool;
+					this.setState({ currentTool: "pan" });
+					drawingCanvas.setTool("pan");
+					break;
+				case "KeyB":
+					drawingCanvas.setTool("brush");
+					break;
+				case "KeyE":
+					drawingCanvas.setTool("eraser");
+					break;
+			}
+		};
+		this.keyupHandler = (e) => {
+			prevKey = {
+				ctrlKey: false,
+				code: "",
+			};
+
+			switch (e.code) {
+				case "Space":
+					drawingCanvas.setTool(this.toolBeforePan);
+					this.setState({ currentTool: this.toolBeforePan });
+					break;
+			}
+		};
+
+		window.addEventListener("keydown", this.keydownHandler);
+		window.addEventListener("keyup", this.keyupHandler);
+	}
+	componentWillUnmount(): void {
+		if (this.keydownHandler) {
+			window.removeEventListener("keydown", this.keydownHandler);
+			window.removeEventListener("keyup", this.keyupHandler);
+		}
 	}
 	render() {
 		return (
@@ -119,7 +196,7 @@ export default class Draw extends Component<IProps, IState> {
 								{
 									name: "Brush",
 									icon: Brush,
-									tool: "brush",
+									tool: "brush" as ITool,
 									onClick: () => {
 										this.state.drawingCanvas?.setTool("brush");
 										this.setState({ currentTool: "brush" });
@@ -128,7 +205,7 @@ export default class Draw extends Component<IProps, IState> {
 								{
 									name: "Eraser",
 									icon: Eraser,
-									tool: "eraser",
+									tool: "eraser" as ITool,
 									onClick: () => {
 										this.state.drawingCanvas?.setTool("eraser");
 										this.setState({ currentTool: "eraser" });
@@ -137,7 +214,7 @@ export default class Draw extends Component<IProps, IState> {
 								{
 									name: "Move",
 									icon: Move,
-									tool: "pan",
+									tool: "pan" as ITool,
 									onClick: () => {
 										this.state.drawingCanvas?.setTool("pan");
 										this.setState({ currentTool: "pan" });
@@ -149,7 +226,12 @@ export default class Draw extends Component<IProps, IState> {
 									<button
 										key={name}
 										type="button"
-										onPointerDown={onClick}
+										onPointerDown={() => {
+											onClick();
+											if (tool !== "pan") {
+												this.toolBeforePan = tool;
+											}
+										}}
 										className="flex justify-center items-center bg-transparent hover:bg-[#fff4_!important] rounded-md w-8 h-8 transition-colors"
 										style={{
 											background:
