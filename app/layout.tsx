@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { Playpen_Sans } from "next/font/google";
 import "./globals.css";
 
-const playpen_sans = Playpen_Sans({ subsets: ["latin"] });
-
 function generateMetadata({
 	title,
 	description,
@@ -43,8 +41,19 @@ export default function RootLayout({
 					name="viewport"
 					content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
 				/>
+
+				<link rel="preconnect" href="https://fonts.googleapis.com" />
+				<link
+					rel="preconnect"
+					href="https://fonts.gstatic.com"
+					crossOrigin="anonymous"
+				/>
+				<link
+					href="https://fonts.googleapis.com/css2?family=Playpen+Sans:wght@100..800&display=swap"
+					rel="stylesheet"
+				/>
 			</head>
-			<body className={playpen_sans.className}>{children}</body>
+			<body className="font-playpen">{children}</body>
 		</html>
 	);
 }
