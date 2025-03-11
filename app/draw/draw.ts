@@ -203,6 +203,10 @@ function main(viewport: Viewport) {
 		isPointerDown = false;
 		if (!canvasObjects[canvasObjects.length - 1]) return;
 		canvasObjects[canvasObjects.length - 1].points = currentLinePoints;
+
+		drawingLayer.children
+			.findLast((c) => c instanceof PIXI.Graphics)
+			?.cacheAsTexture(true);
 	});
 	viewport.on("pointermove", (e) => {
 		if (params.isPanning) return;
