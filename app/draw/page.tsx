@@ -253,9 +253,9 @@ export default class Draw extends Component<IProps, IState> {
 												100,
 												Math.max(
 													1,
-													this.state.currentTool === "eraser"
+													(this.state.currentTool === "eraser"
 														? this.state.eraserSize
-														: this.state.brushSize - 1
+														: this.state.brushSize) - 1
 												)
 											);
 											this.state.currentTool === "eraser"
@@ -294,7 +294,12 @@ export default class Draw extends Component<IProps, IState> {
 										onClick={() => {
 											const s = Math.min(
 												100,
-												Math.max(1, this.state.brushSize + 1)
+												Math.max(
+													1,
+													(this.state.currentTool === "eraser"
+														? this.state.eraserSize
+														: this.state.brushSize) + 1
+												)
 											);
 											this.state.currentTool === "eraser"
 												? this.setState({ eraserSize: s })
