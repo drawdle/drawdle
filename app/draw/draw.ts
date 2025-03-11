@@ -9,6 +9,7 @@ type PanMode = "pan-zoom" | "none";
 const params = {
 	tool: "brush",
 	color: 0x000000,
+	brushColor: 0x000000,
 	isPanning: false,
 	brushSize: 1,
 	eraserSize: 5,
@@ -266,7 +267,7 @@ export function setTool(tool: Tool) {
 	}
 	if (["brush", "eraser"].includes(tool)) {
 		setPanMode("none");
-		params.color = tool === "brush" ? 0x000000 : 0xffffff;
+		params.color = tool === "brush" ? params.brushColor : 0xffffff;
 	}
 }
 
@@ -280,6 +281,9 @@ export function setSize(size: number) {
 
 export function setColor(color: HexColor) {
 	params.color = Number.parseInt(color.replaceAll("#", ""), 16);
+	if (params.tool === "brush") {
+		params.brushColor = params.color;
+	}
 }
 
 export interface DrawingCanvas {
