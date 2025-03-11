@@ -88,62 +88,11 @@ export const rgb2hex = (r: number, g: number, b: number): string => {
 		.slice(1);
 };
 
-/**
- * Calculates the luminosity estimation based on the given hue value.
- *
- * @param {number} hue - The hue value.
- * @return {number} The calculated luminosity estimation.
- */
-const hueToRelativeLuminosityEstimation = (hue: number): number => {
-	const p = 0.7495;
-	const e1 = 1.4;
-	const m1 = 90;
-	const d1 = -0.8166;
-	const s1 = 2000;
-	const e2 = 2.1;
-	const m2 = 250;
-	const d2 = 0.8166;
-	const s2 = 1200;
-
-	function bellCurve(
-		x: number,
-		d: number,
-		p: number,
-		e: number,
-		s: number,
-		m: number
-	) {
-		return (1 / (d * Math.sqrt(2 * p))) * e ** ((-1 / s) * ((x - m) / d) ** 2);
-	}
-
-	return (
-		bellCurve(hue, d1, p, e1, s1, m1) +
-		bellCurve(hue, d2, p, e2, s2, m2) +
-		bellCurve(hue, d1, p, e1, s1, m1 + 360)
-	);
-};
-/**
- * Checks the luminosity curve for a given cursor position on the screen.
- *
- * @param cursorPosition - The position of the cursor on the color picker.
- * @param cursorPosition.x - The x-coordinate of the cursor.
- * @param cursorPosition.y - The y-coordinate of the cursor.
- * @param width - The width of the screen.
- * @param height - The height of the screen.
- * @param hue - The hue value.
- * @returns Whether the y-coordinate is below the calculated curve point.
- */
-export const checkHlLuminosityCurve = (
-	cursorPosition: { x: number; y: number },
-	width: number,
-	height: number,
-	hue: number
-): boolean => {
-	function calculateCurve(x: number, curveFactor: number) {
-		return ((curveFactor + 1) * x ** 2) / 4 + 0.5;
-	}
-	const x = cursorPosition.x / width;
-	const y = (height - cursorPosition.y) / height;
-	const curvePoint = calculateCurve(x, hueToRelativeLuminosityEstimation(hue));
-	return y < curvePoint;
+export const calculateLuminance = ([r, g, b]: [
+	number,
+	number,
+	number
+]): boolean => {
+	const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+	return luminance < 128;
 };

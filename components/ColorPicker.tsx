@@ -4,7 +4,7 @@ import {
 	type HexColor,
 	type HsvColor,
 	type RgbColor,
-	checkHlLuminosityCurve,
+	calculateLuminance,
 	hex2rgb,
 	hsv2rgb,
 	rgb2hex,
@@ -264,12 +264,11 @@ export class ColorPicker extends Component<IProps, IState> {
 												style={{
 													top: this.state.selector2dPos.y,
 													left: this.state.selector2dPos.x,
-													borderColor: checkHlLuminosityCurve(
-														this.state.selector2dPos,
-														this.state.selectorSize,
-														this.state.selectorSize,
-														this.state.hue
-													)
+													borderColor: calculateLuminance([
+														this.state.rgb.r,
+														this.state.rgb.g,
+														this.state.rgb.b,
+													])
 														? "white"
 														: "black",
 												}}
@@ -299,7 +298,7 @@ export class ColorPicker extends Component<IProps, IState> {
 											<p className="w-3">H:</p>
 											<input
 												type="number"
-												className="border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] outline-hidden bg-beige-700 px-1 py-3 border rounded-sm w-10 h-4 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+												className="bg-beige-700 px-1 py-3 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] rounded-sm outline-hidden w-10 h-4 text-sm [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
 												min={0}
 												max={360}
 												value={Math.round(this.state.hue).toString()}
@@ -326,7 +325,7 @@ export class ColorPicker extends Component<IProps, IState> {
 											<p className="w-3">S:</p>
 											<input
 												type="number"
-												className="border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] outline-hidden bg-beige-700 px-1 py-3 border rounded-md w-10 h-4 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+												className="bg-beige-700 px-1 py-3 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] rounded-md outline-hidden w-10 h-4 text-sm [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
 												min={0}
 												max={100}
 												value={Math.round(this.state.saturation).toString()}
@@ -355,7 +354,7 @@ export class ColorPicker extends Component<IProps, IState> {
 											<p className="w-3">V:</p>
 											<input
 												type="number"
-												className="border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] outline-hidden bg-beige-700 px-1 py-3 border rounded-md w-10 h-4 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+												className="bg-beige-700 px-1 py-3 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] rounded-md outline-hidden w-10 h-4 text-sm [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
 												min={0}
 												max={100}
 												value={Math.round(this.state.value).toString()}
@@ -388,7 +387,7 @@ export class ColorPicker extends Component<IProps, IState> {
 											<p className="w-3">R:</p>
 											<input
 												type="number"
-												className="border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] outline-hidden bg-beige-700 px-1 py-3 border rounded-md w-10 h-4 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+												className="bg-beige-700 px-1 py-3 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] rounded-md outline-hidden w-10 h-4 text-sm [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
 												min={0}
 												max={255}
 												value={Math.round(this.state.rgb.r).toString()}
@@ -408,7 +407,7 @@ export class ColorPicker extends Component<IProps, IState> {
 											<p className="w-3">G:</p>
 											<input
 												type="number"
-												className="border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] outline-hidden bg-beige-700 px-1 py-3 border rounded-md w-10 h-4 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+												className="bg-beige-700 px-1 py-3 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] rounded-md outline-hidden w-10 h-4 text-sm [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
 												min={0}
 												max={255}
 												value={Math.round(this.state.rgb.g).toString()}
@@ -428,7 +427,7 @@ export class ColorPicker extends Component<IProps, IState> {
 											<p className="w-3">B:</p>
 											<input
 												type="number"
-												className="border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] outline-hidden bg-beige-700 px-1 py-3 border rounded-md w-10 h-4 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+												className="bg-beige-700 px-1 py-3 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] rounded-md outline-hidden w-10 h-4 text-sm [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
 												min={0}
 												max={255}
 												value={Math.round(this.state.rgb.b).toString()}
@@ -452,7 +451,7 @@ export class ColorPicker extends Component<IProps, IState> {
 										<input
 											type="text"
 											maxLength={6}
-											className="border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] outline-hidden bg-beige-700 px-1 py-3 border rounded-md w-24 h-4 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+											className="bg-beige-700 px-1 py-3 border border-[#fff2] hover:border-[#fff4] focus:border-[#fff4] rounded-md outline-hidden w-24 h-4 text-sm [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
 											value={this.state.hex}
 											onChange={(e) => {
 												const newHex = e.target.value;
