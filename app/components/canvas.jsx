@@ -147,6 +147,28 @@ export default class DrawingCanvas extends React.Component {
       },
       { passive: false }
     );
+      // Load drawing automatically
+      fetch('/api/load')
+      .then(res => res.json())
+      .then(result => {
+        if (result.success && result.data) {
+          try {
+            this.lines = JSON.parse(result.data);  // parse once
+          } catch (e) {
+            console.error("JSON parsing failed:", e, result.data);
+            this.lines = [];
+          }
+        } else {
+          this.lines = [];
+        }
+        this.drawCanvas();
+      })
+      .catch(e => {
+        console.error("Fetch error:", e);
+        this.lines = [];
+        this.drawCanvas();
+      });
+
     const handlePointerDown = (e) => {
       this.activePointers.push(e);
       if (this.activePointers.length == 1) {
@@ -329,6 +351,18 @@ export default class DrawingCanvas extends React.Component {
     });
 
     this.drawCanvas();
+  }
+
+  async saveDrawing() {
+    console.log("hi");
+    if (this.lines.length == 0) {return;}
+    await fetch('/api/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      // Stringify this only ONCE
+      body: JSON.stringify({ data: JSON.stringify(this.lines)}),
+    });
+
   }
 
   drawCanvas() {
@@ -555,45 +589,48 @@ export default class DrawingCanvas extends React.Component {
           >
             <i className="bi-grip-vertical"></i>
           </div>
-          {[
-            {
-              text: "Pan",
-              icon: "bi-arrows-move",
-            },
-            {
-              text: "Draw",
-              icon: "bi-pencil",
-            },
-            {
-              text: "Erase",
-              icon: "bi-eraser",
-            },
-            {
-              text: "Line",
-              icon: "bi-slash-lg",
-            },
-            {
-              text: "Color Picker",
-              icon: "bi-eyedropper",
-            },
-          ].map((e, i) => (
-            <button
-              key={i}
-              className={
-                (this.state.tool == e.text
-                  ? "bg-[#fff2] "
-                  : "bg-transparent ") + "w-8 h-8 hover:bg-[#fff4] rounded"
+          {
+            [
+              { text: "Pan", icon: "bi-arrows-move" },
+              { text: "Draw", icon: "bi-pencil" },
+              { text: "Erase", icon: "bi-eraser" },
+              { text: "Line", icon: "bi-slash-lg" },
+              { text: "Color Picker", icon: "bi-eyedropper" },
+              { text: "Save", icon: "bi-save" }
+            ].map((e, i) => {
+              if (e.text === "Save") {
+                return (
+                  <button
+                    key={i}
+                    className={"w-8 h-8 hover:bg-[#fff4] rounded"}
+                    onClick={() => this.saveDrawing()}
+                    data-tooltip-id="toolbar-tooltip"
+                    data-tooltip-content={e.text}
+                  >
+                    <i className={e.icon}></i>
+                  </button>
+                );
+              } else {
+                return (
+                  <button
+                    key={i}
+                    className={
+                      (this.state.tool === e.text ? "bg-[#fff2] " : "bg-transparent ") +
+                      "w-8 h-8 hover:bg-[#fff4] rounded"
+                    }
+                    onClick={() => {
+                      this.setState({ tool: e.text, brushMenuVisible: false });
+                    }}
+                    data-tooltip-id="toolbar-tooltip"
+                    data-tooltip-content={e.text}
+                  >
+                    <i className={e.icon}></i>
+                  </button>
+                );
               }
-              onClick={() => {
-                this.setState({ tool: e.text });
-                this.setState({ brushMenuVisible: false });
-              }}
-              data-tooltip-id="toolbar-tooltip"
-              data-tooltip-content={e.text || ""}
-            >
-              <i className={e.icon}></i>
-            </button>
-          ))}
+            })
+          }
+
           <div className="border-l border-beige-700 h-8 w-0"></div>
           {[
             {
