@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Playpen_Sans } from "next/font/google";
 import "./globals.css";
 
 function generateMetadata({
@@ -24,7 +23,7 @@ function generateMetadata({
 }
 
 export const metadata: Metadata = generateMetadata({
-	title: "Draw-dle",
+	title: "Drawdle",
 	description: "Learn to draw by completing scribbles",
 	iconUrl: "/favicon.ico",
 });
