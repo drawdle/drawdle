@@ -6,7 +6,8 @@
  * @param {number} b - The maximum bound.
  * @returns {number} - The clamped value.
  */
-export const clamp = (x, a, b) => Math.max(a, Math.min(x, b));
+export const clamp = (x: number, a: number, b: number): number =>
+	Math.max(a, Math.min(x, b));
 
 /**
  * Calculates the mean of an array of numbers.
@@ -14,4 +15,5 @@ export const clamp = (x, a, b) => Math.max(a, Math.min(x, b));
  * @param {number[]} arr - The array of numbers.
  * @returns {number} The mean value of the numbers in the array.
  */
-export const mean = (arr) => arr.reduce((a, b) => a + b, 0) / arr.length;
+export const mean = (arr: number[]): number =>
+	arr.reduce((a, b) => a + b, 0) / arr.length;

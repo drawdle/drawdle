@@ -1,26 +1,42 @@
 {
-  "name": "drawdle",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "@vercel/node": "^5.1.14",
-    "better-sqlite3": "^11.9.1",
-    "get-canvas-pixel-color": "^2.0.1",
-    "next": "^14.0.2",
-    "rc-slider": "^10.5.0",
-    "react": "^18",
-    "react-dom": "^18",
-    "react-tooltip": "^5.24.0"
-  },
-  "devDependencies": {
-    "autoprefixer": "^10.0.1",
-    "postcss": "^8",
-    "tailwindcss": "^3.3.0"
-  }
+	"name": "learn-to-draw",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint": "next lint"
+	},
+	"dependencies": {
+		"@vercel/node": "^5.1.14",
+		"better-sqlite3": "^11.9.1",
+		"lucide-react": "^0.479.0",
+		"next": "^15.2.1",
+		"pixi-filters": "^6.1.0",
+		"pixi-viewport": "^6.0.3",
+		"pixi.js": "^8.8.1",
+		"react": "^19.0.0",
+		"react-dom": "^19.0.0",
+		"react-draggable": "^4.4.6"
+	},
+	"devDependencies": {
+		"@tailwindcss/postcss": "^4.0.12",
+		"@types/node": "^22.13.10",
+		"@types/react": "^19.0.10",
+		"@types/react-dom": "^19.0.4",
+		"eslint": "^9.22.0",
+		"eslint-config-next": "15.1.7",
+		"postcss": "^8.5.3",
+		"tailwindcss": "^4.0.12",
+		"typescript": "^5.8.2"
+	},
+	"packageManager": "pnpm@10.6.2",
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"better-sqlite3",
+			"esbuild",
+			"sharp"
+		]
+	}
 }

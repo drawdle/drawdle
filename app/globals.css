@@ -1,23 +1,59 @@
-@import url("bootstrapIcons.css");
+@import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@theme {
+	--color-beige-100: #faf7f2;
+	--color-beige-200: #f5efe5;
+	--color-beige-300: #efe8d8;
+	--color-beige-400: #eae0cb;
+	--color-beige-500: #e5d8be;
+	--color-beige-600: #b7ad98;
+	--color-beige-700: #898272;
+	--color-beige-800: #5c564c;
+	--color-beige-900: #2e2b26;
+}
 
-body {
-  overflow-x: hidden;
-  overflow-y: auto;
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+	*,
+	::after,
+	::before,
+	::backdrop,
+	::file-selector-button {
+		border-color: var(--color-gray-200, currentColor);
+	}
+}
+
+@layer theme {
+	.font-playpen {
+		font-family: "Playpen Sans", sans-serif;
+	}
+}
+
+@keyframes loadingSpinner {
+	0% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
 }
 
 .vertical-rainbow {
-  background: linear-gradient(
-    to top,
-    rgb(255, 0, 0) 0%,
-    rgb(255, 255, 0) 16.66%,
-    rgb(0, 255, 0) 33.33%,
-    rgb(0, 255, 255) 50%,
-    rgb(0, 0, 255) 66.66%,
-    rgb(255, 0, 255) 83.33%,
-    rgb(255, 0, 0) 100%
-  );
+	background: linear-gradient(
+		to top,
+		rgb(255, 0, 0) 0%,
+		rgb(255, 255, 0) 16.66%,
+		rgb(0, 255, 0) 33.33%,
+		rgb(0, 255, 255) 50%,
+		rgb(0, 0, 255) 66.66%,
+		rgb(255, 0, 255) 83.33%,
+		rgb(255, 0, 0) 100%
+	);
 }

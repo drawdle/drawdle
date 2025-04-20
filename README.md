@@ -1,9 +1,11 @@
 # Draw-dle
-*Learn to draw by completing scribbles*
+
+_Learn to draw by completing scribbles_
 
 ## Getting Started
 
 Clone repository, then run
+
 ```bash
 npm run dev
 ```
