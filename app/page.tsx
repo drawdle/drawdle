@@ -15,7 +15,16 @@ export default function Home() {
 			</div>
 			<div className="flex flex-col justify-start items-start gap-4 p-24">
 				<h2 className="text-2xl">Preview</h2>
-				<img className="shadow-lg border border-beige-400 rounded-2xl" src="/preview.jpg" alt="Preview" />
+				<img
+					className="shadow-lg border border-beige-700/50 rounded-2xl"
+					src="/preview.jpg"
+					alt="Preview"
+				/>
+				<img
+					className="shadow-lg border border-beige-700/50 rounded-2xl"
+					src="/preview2.jpg"
+					alt="Preview"
+				/>
 			</div>
 		</main>
 	);
