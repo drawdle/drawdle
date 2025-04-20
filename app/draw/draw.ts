@@ -80,7 +80,7 @@ app
 		main(viewport);
 	});
 
-function main(viewport: Viewport) {
+async function main(viewport: Viewport) {
 	// viewport.drag({ factor: 0 }).pinch({ factor: 0 }).wheel({ percent: 0 });
 	viewport.drag({ pressDrag: false }).pinch().wheel().decelerate();
 	_setPanMode = (mode: "pan-zoom" | "none") => {
@@ -256,9 +256,28 @@ function main(viewport: Viewport) {
 		if (!pixiObject) return;
 		pixiObject.visible = true;
 	};
+
+	const res = await (await fetch("/api/load")).json();
+	if (!res.success || !res.data) return;
+    const data = JSON.parse(res.data) as CanvasObjectsList;
+	for (const obj of data) {
+		drawingLayer.addChild(
+			new PIXI.Graphics().setStrokeStyle({
+				color: obj.color,
+				cap: "round",
+				join: "round",
+				width: obj.size,
+			})
+		);
+        currentLinePoints = obj.points;
+        drawLine();
+		canvasObjects.push(obj);
+	}
 }
 export let undo: () => void;
 export let redo: () => void;
+
+export const getLines = () => canvasObjects;
 
 export function setTool(tool: Tool) {
 	params.tool = tool;
@@ -287,6 +306,8 @@ export function setColor(color: HexColor) {
 }
 
 export interface DrawingCanvas {
+	getLines(): CanvasObjectsList;
+
 	setTool: (tool: Tool) => void;
 	setPanMode: (mode: PanMode) => void;
 	setSize: (size: number) => void;

@@ -2,9 +2,6 @@
 import {
 	Component,
 	createRef,
-	ForwardRefExoticComponent,
-	JSX,
-	RefAttributes,
 	type RefObject,
 } from "react";
 import Draggable from "react-draggable";
@@ -16,10 +13,11 @@ import type { HexColor } from "@/utils/color.ts";
 import {
 	Brush,
 	Eraser,
+	Film,
 	GripVertical,
-	LucideProps,
 	Move,
 	Redo,
+	Save,
 	Undo,
 } from "lucide-react";
 
@@ -121,6 +119,21 @@ export default class Draw extends Component<IProps, IState> {
 			window.removeEventListener("keyup", this.keyupHandler);
 		}
 	}
+
+	async saveDrawing() {
+		if (this.state.drawingCanvas?.getLines().length === 0) {
+			return;
+		}
+		await fetch("/api/save", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			// Stringify this only ONCE
+			body: JSON.stringify({
+				data: JSON.stringify(this.state.drawingCanvas?.getLines()),
+			}),
+		});
+	}
+
 	render() {
 		return (
 			<>
@@ -163,6 +176,23 @@ export default class Draw extends Component<IProps, IState> {
 							ref={this.toolbarRef}
 						>
 							<GripVertical className="w-4 cursor-move handle" />
+							<button
+								type="button"
+								onClick={() => {
+									this.saveDrawing();
+								}}
+								className="flex justify-center items-center bg-transparent hover:bg-[#fff4_!important] rounded-md w-8 h-8 transition-colors"
+							>
+								<Save size={20} />
+							</button>
+							<button
+								type="button"
+								onClick={() => {}}
+								className="flex justify-center items-center bg-transparent hover:bg-[#fff4_!important] rounded-md w-8 h-8 transition-colors"
+							>
+								<Film size={20} />
+							</button>
+							<div className="border-beige-800 border-l h-6" />
 							{[
 								{
 									name: "Undo",
