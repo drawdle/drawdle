@@ -1,9 +1,5 @@
 "use client";
-import {
-	Component,
-	createRef,
-	type RefObject,
-} from "react";
+import { Component, createRef, useState, type RefObject } from "react";
 import Draggable from "react-draggable";
 
 import type { DrawingCanvas } from "./draw.ts";
@@ -11,6 +7,8 @@ import { LoadingSpinner } from "@/components/LoadingSpinner.tsx";
 import { ColorPicker } from "@/components/ColorPicker.tsx";
 import type { HexColor } from "@/utils/color.ts";
 import {
+    ArrowLeft,
+	ArrowRight,
 	Brush,
 	Eraser,
 	Film,
@@ -19,6 +17,7 @@ import {
 	Redo,
 	Save,
 	Undo,
+	X,
 } from "lucide-react";
 
 type ITool = "brush" | "eraser" | "pan";
@@ -33,6 +32,8 @@ interface IState {
 
 	showColorPicker: boolean;
 	color: HexColor;
+
+	showTutorial: boolean;
 }
 
 export default class Draw extends Component<IProps, IState> {
@@ -54,6 +55,8 @@ export default class Draw extends Component<IProps, IState> {
 
 			showColorPicker: false,
 			color: "#000000",
+
+			showTutorial: false,
 		};
 
 		this.toolbarRef = createRef<HTMLDivElement>();
@@ -187,7 +190,9 @@ export default class Draw extends Component<IProps, IState> {
 							</button>
 							<button
 								type="button"
-								onClick={() => {}}
+								onClick={() => {
+									this.setState({ showTutorial: !this.state.showTutorial });
+								}}
 								className="flex justify-center items-center bg-transparent hover:bg-[#fff4_!important] rounded-md w-8 h-8 transition-colors"
 							>
 								<Film size={20} />
@@ -370,7 +375,78 @@ export default class Draw extends Component<IProps, IState> {
 						visible={this.state.showColorPicker}
 					/>
 				)}
+				<TutorialPane
+					show={this.state.showTutorial}
+					onClose={() => this.setState({ showTutorial: false })}
+				/>
 			</>
 		);
 	}
 }
+
+const tutorials = [
+	{
+		name: "Color theory",
+		id: "E918sCkgSRU",
+		description:
+			"In this video, you will learn how to use colors in your drawings to make them more appealing. You will learn about the color wheel, complementary colors, and how to create a color palette.",
+	},
+];
+const TutorialPane = ({
+	show,
+	onClose,
+}: {
+	show: boolean;
+	onClose: () => void;
+}) => {
+	const [currentPage, setCurrentPage] = useState(0);
+
+	return (
+		<div
+			className="top-0 right-0 bottom-0 fixed flex flex-col gap-3 bg-beige-900 shadow-2xl p-4 rounded-l-4xl w-96 text-beige-200 transition-all duration-300"
+			style={{
+				opacity: show ? 1 : 0,
+				translate: show ? "0 0" : "100% 0",
+			}}
+		>
+			<button
+				type="button"
+				className="top-4 right-4 absolute bg-beige-800 p-2 rounded-lg text-beige-200 text-xl"
+				onClick={onClose}
+			>
+				<X size={20} />
+			</button>
+			<h1 className="p-2 text-xl">{tutorials[currentPage].name}</h1>
+			<iframe
+				className="rounded-xl w-full aspect-video"
+				src={`https://www.youtube-nocookie.com/embed/${tutorials[currentPage].id}`}
+				title="YouTube video player"
+				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+				referrerPolicy="strict-origin-when-cross-origin"
+				allowFullScreen
+			/>
+			<p className="p-2 text-sm">{tutorials[currentPage].description}</p>
+
+            <div className="grow" />
+
+			<div className="flex justify-stretch items-center gap-2 opacity-50 p-2 w-full">
+				<button
+					type="button"
+					className="flex justify-start items-center gap-2 bg-beige-800 px-4 py-2 rounded-xl w-1/2 text-beige-200"
+					onClick={() => {}}
+				>
+					<ArrowLeft size={20} />
+					Previous
+				</button>
+				<button
+					type="button"
+					className="flex justify-end items-center gap-2 bg-beige-800 px-4 py-2 rounded-xl w-1/2 text-beige-200"
+					onClick={() => {}}
+				>
+					Next
+					<ArrowRight size={20} />
+				</button>
+			</div>
+		</div>
+	);
+};
