@@ -119,8 +119,10 @@ export default class Draw extends Component<IProps, IState> {
 	componentWillUnmount(): void {
 		if (this.keydownHandler) {
 			window.removeEventListener("keydown", this.keydownHandler);
-			window.removeEventListener("keyup", this.keyupHandler);
 		}
+        if (this.keyupHandler) {
+            window.removeEventListener("keyup", this.keyupHandler);
+        }
 	}
 
 	async saveDrawing() {
